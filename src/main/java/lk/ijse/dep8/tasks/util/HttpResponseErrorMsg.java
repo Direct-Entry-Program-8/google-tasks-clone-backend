@@ -47,7 +47,8 @@ public class HttpResponseErrorMsg implements Serializable {
     }
 
     public String getException() {
-        return exception;
+        return System.getProperty("app.profiles.active").equals("dev") ?
+                exception : null;
     }
 
     public void setException(String exception) {
