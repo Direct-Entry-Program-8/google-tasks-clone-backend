@@ -55,11 +55,11 @@ public class WebAppContext implements ServletContextListener {
                 Files.createDirectory(logDirPath);
             }
 
-            final String path = logDirPath.toAbsolutePath() + File.separator + LocalDate.now() + "-tasks-log-%g.log";
-            installFileHandler(path);
+            final String path = logDirPath.toAbsolutePath().toString();
+            installFileHandler(getPath(path));
 
             ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-            executor.scheduleWithFixedDelay(() -> installFileHandler(path),
+            executor.scheduleWithFixedDelay(() -> installFileHandler(getPath(path)),
                     Duration.between(LocalTime.now(), LocalTime.MIDNIGHT).toMillis(),
                     60 * 60 * 1000 * 24, TimeUnit.MILLISECONDS);
 
@@ -67,6 +67,10 @@ public class WebAppContext implements ServletContextListener {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
 
+    }
+
+    private String getPath(String logDirPath){
+        return logDirPath+ File.separator + LocalDate.now() + "-tasks-log-%g.log";
     }
 
     private void installFileHandler(String path) {
