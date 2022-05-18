@@ -20,9 +20,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @WebListener
-public class WebAppContext implements ServletContextListener {
+public class LogInitializer implements ServletContextListener {
 
-    private final Logger logger = Logger.getLogger(WebAppContext.class.getName());
+    private final Logger logger = Logger.getLogger(LogInitializer.class.getName());
     private FileHandler fileHandler;
 
     @Override
