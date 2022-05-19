@@ -24,10 +24,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @MultipartConfig(location = "/tmp", maxFileSize = 10 * 1024 * 1024)
 @WebServlet(name = "UserServlet", value = "/v1/users/*")
 public class UserServlet extends HttpServlet2 {
+
+    private Logger logger = Logger.getLogger(UserServlet.class.getName());
 
     @Resource(name = "java:comp/env/jdbc/pool")
     private volatile DataSource pool;
@@ -69,6 +72,16 @@ public class UserServlet extends HttpServlet2 {
                 throw new SQLException("Failed to delete the user");
             }
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+
+            new Thread(()->{
+                Path imagePath = Paths.get(getServletContext().getRealPath("/"), "uploads",
+                        user.getId());
+                try {
+                    Files.deleteIfExists(imagePath);
+                } catch (IOException e) {
+                    logger.warning("Failed to delete the image: " + imagePath.toAbsolutePath());
+                }
+            }).start();
         } catch (SQLException e) {
             throw new ResponseStatusException(500, e.getMessage(), e);
         }
