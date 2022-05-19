@@ -87,7 +87,8 @@ public class UserServlet extends HttpServlet2 {
             connection = pool.getConnection();
             connection.setAutoCommit(false);
 
-            PreparedStatement stm = connection.prepareStatement("UPDATE user SET full_name=?, password=?, profile_pic=? WHERE id=?");
+            PreparedStatement stm = connection.
+                    prepareStatement("UPDATE user SET full_name=?, password=?, profile_pic=? WHERE id=?");
             stm.setString(1, name);
             stm.setString(2, DigestUtils.sha256Hex(password));
 
@@ -106,21 +107,21 @@ public class UserServlet extends HttpServlet2 {
 
             String appLocation = getServletContext().getRealPath("/");
             Path path = Paths.get(appLocation, "uploads");
-            String picturePath = path.resolve(user.getId()).toAbsolutePath().toString();
+            Path picturePath = path.resolve(user.getId());
 
             if (picture != null) {
                 if (Files.notExists(path)) {
                     Files.createDirectory(path);
                 }
 
-                Files.deleteIfExists(Paths.get(picturePath));
-                picture.write(picturePath);
+                Files.deleteIfExists(picturePath);
+                picture.write(picturePath.toAbsolutePath().toString());
 
-                if (Files.notExists(Paths.get(picturePath))) {
+                if (Files.notExists(picturePath)) {
                     throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the picture");
                 }
             } else {
-                Files.deleteIfExists(Paths.get(picturePath));
+                Files.deleteIfExists(picturePath);
             }
 
             connection.commit();
