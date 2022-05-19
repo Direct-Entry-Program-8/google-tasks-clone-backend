@@ -124,6 +124,7 @@ public class UserServlet extends HttpServlet2 {
             }
 
             connection.commit();
+            resp.setStatus(204);
         } catch (SQLException e) {
             throw new ResponseStatusException(500, e.getMessage(), e);
         } finally {
