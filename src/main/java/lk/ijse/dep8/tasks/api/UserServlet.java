@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 @WebServlet(name = "UserServlet", value = "/v1/users/*")
 public class UserServlet extends HttpServlet2 {
 
-    private Logger logger = Logger.getLogger(UserServlet.class.getName());
+    private final Logger logger = Logger.getLogger(UserServlet.class.getName());
 
     @Resource(name = "java:comp/env/jdbc/pool")
     private volatile DataSource pool;
@@ -63,6 +63,11 @@ public class UserServlet extends HttpServlet2 {
     }
 
     @Override
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        UserDTO user = getUser(req);
+    }
+
+    @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         UserDTO user = getUser(req);
         try (Connection connection = pool.getConnection()) {
@@ -73,7 +78,7 @@ public class UserServlet extends HttpServlet2 {
             }
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 
-            new Thread(()->{
+            new Thread(() -> {
                 Path imagePath = Paths.get(getServletContext().getRealPath("/"), "uploads",
                         user.getId());
                 try {
@@ -141,26 +146,34 @@ public class UserServlet extends HttpServlet2 {
             stm.setString(3, DigestUtils.sha256Hex(password));
             stm.setString(4, name);
 
-            String pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
-                    + request.getServerPort() + request.getContextPath();
-            pictureUrl += "/uploads/" + id;
+            String pictureUrl = null;
+            if (picture != null) {
+                pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
+                        + request.getServerPort() + request.getContextPath();
+                pictureUrl += "/uploads/" + id;
 
-            stm.setString(5, pictureUrl);
+                stm.setString(5, pictureUrl);
+            } else {
+                stm.setString(5, null);
+            }
+
             if (stm.executeUpdate() != 1) {
                 throw new SQLException("Failed to register the user");
             }
 
-            String appLocation = getServletContext().getRealPath("/");
-            Path path = Paths.get(appLocation, "uploads");
-            if (Files.notExists(path)) {
-                Files.createDirectory(path);
-            }
+            if (picture != null) {
+                String appLocation = getServletContext().getRealPath("/");
+                Path path = Paths.get(appLocation, "uploads");
+                if (Files.notExists(path)) {
+                    Files.createDirectory(path);
+                }
 
-            String picturePath = path.resolve(id).toAbsolutePath().toString();
-            picture.write(picturePath);
+                String picturePath = path.resolve(id).toAbsolutePath().toString();
+                picture.write(picturePath);
 
-            if (Files.notExists(Paths.get(picturePath))) {
-                throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the picture");
+                if (Files.notExists(Paths.get(picturePath))) {
+                    throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the picture");
+                }
             }
 
             connection.commit();
