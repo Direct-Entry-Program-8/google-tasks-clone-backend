@@ -3,17 +3,29 @@ package lk.ijse.dep8.tasks.api;
 import lk.ijse.dep8.tasks.util.HttpServlet2;
 import lk.ijse.dep8.tasks.util.ResponseStatusException;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import javax.sql.DataSource;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @MultipartConfig(location = "/tmp", maxFileSize = 10 * 1024 * 1024)
-@WebServlet(name = "UserServlet", value = "/users/*")
+@WebServlet(name = "UserServlet", value = "/v1/users/*")
 public class UserServlet extends HttpServlet2 {
+
+    @Resource(name = "java:comp/env/jdbc/pool")
+    private volatile DataSource pool;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -39,6 +51,37 @@ public class UserServlet extends HttpServlet2 {
             throw new ResponseStatusException(HttpServletResponse.SC_BAD_REQUEST, "Password can't be empty");
         } else if (picture != null && !picture.getContentType().startsWith("image")) {
             throw new ResponseStatusException(HttpServletResponse.SC_BAD_REQUEST, "Invalid picture");
+        }
+
+        String appLocation = getServletContext().getRealPath("/");
+        Path path = Paths.get(appLocation, "uploads");
+        if (Files.notExists(path)) {
+            Files.createDirectory(path);
+        }
+
+        try (Connection connection = pool.getConnection()) {
+            connection.setAutoCommit(false);
+
+            PreparedStatement stm = connection.
+                    prepareStatement("INSERT INTO user (id, email, password, full_name) VALUES (UUID(), ?, ?, ?)");
+            stm.setString(1, email);
+            stm.setString(2, password);
+            stm.setString(3, name);
+            if (stm.executeUpdate() != 1){
+                throw new SQLException("Failed to register the user");
+            }
+
+            stm = connection.prepareStatement("SELECT id FROM user WHERE email = ?");
+            stm.setString(1, email);
+            ResultSet rst = stm.executeQuery();
+            rst.next();
+            String uuid = rst.getString("id");
+
+            Path imagePath = path.resolve(uuid);
+
+            connection.rollback();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
