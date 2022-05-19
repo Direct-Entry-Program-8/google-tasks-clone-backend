@@ -33,6 +33,15 @@ public class UserServlet extends HttpServlet2 {
     private volatile DataSource pool;
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (!(req.getPathInfo() != null &&
+                (req.getPathInfo().length() == 37 ||
+                req.getPathInfo().length() == 38 && req.getPathInfo().endsWith("/")))){
+            throw new ResponseStatusException(404, "Not found");
+        }
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         if (request.getContentType() == null || !request.getContentType().startsWith("multipart/form-data")) {
