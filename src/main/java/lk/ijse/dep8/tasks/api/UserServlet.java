@@ -151,11 +151,8 @@ public class UserServlet extends HttpServlet2 {
                 pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
                         + request.getServerPort() + request.getContextPath();
                 pictureUrl += "/uploads/" + id;
-
-                stm.setString(5, pictureUrl);
-            } else {
-                stm.setString(5, null);
             }
+            stm.setString(5, pictureUrl);
 
             if (stm.executeUpdate() != 1) {
                 throw new SQLException("Failed to register the user");
