@@ -32,10 +32,9 @@ public class UserServlet extends HttpServlet2 {
     @Resource(name = "java:comp/env/jdbc/pool")
     private volatile DataSource pool;
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private UserDTO getUser(HttpServletRequest req) {
         if (!(req.getPathInfo() != null &&
-                (req.getPathInfo().replaceAll("/", "").length() == 36))){
+                (req.getPathInfo().replaceAll("/", "").length() == 36))) {
             throw new ResponseStatusException(404, "Invalid user id");
         }
 
@@ -46,23 +45,26 @@ public class UserServlet extends HttpServlet2 {
             stm.setString(1, userId);
             ResultSet rst = stm.executeQuery();
 
-            if (!rst.next()){
+            if (!rst.next()) {
                 throw new ResponseStatusException(404, "Invalid user id");
-            }else{
+            } else {
                 String name = rst.getString("full_name");
                 String email = rst.getString("email");
                 String password = rst.getString("password");
                 String picture = rst.getString("profile_pic");
-                UserDTO user = new UserDTO(userId, name, email, password, picture);
-                Jsonb jsonb = JsonbBuilder.create();
-
-                resp.setContentType("application/json");
-                jsonb.toJson(user, resp.getWriter());
+                return new UserDTO(userId, name, email, password, picture);
             }
         } catch (SQLException e) {
             throw new ResponseStatusException(500, "Failed to fetch the user info", e);
         }
+    }
 
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        UserDTO user = getUser(req);
+        Jsonb jsonb = JsonbBuilder.create();
+        resp.setContentType("application/json");
+        jsonb.toJson(user, resp.getWriter());
     }
 
     @Override
@@ -92,12 +94,12 @@ public class UserServlet extends HttpServlet2 {
         }
 
         Connection connection = null;
-        try{
+        try {
             connection = pool.getConnection();
 
             PreparedStatement stm = connection.prepareStatement("SELECT id FROM user WHERE email = ?");
             stm.setString(1, email);
-            if (stm.executeQuery().next()){
+            if (stm.executeQuery().next()) {
                 throw new ResponseStatusException(HttpServletResponse.SC_CONFLICT, "A user has been already registered with this email");
             }
 
@@ -113,7 +115,7 @@ public class UserServlet extends HttpServlet2 {
 
             String pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
                     + request.getServerPort() + request.getContextPath();
-            pictureUrl += "/uploads/" + id ;
+            pictureUrl += "/uploads/" + id;
 
             stm.setString(5, pictureUrl);
             if (stm.executeUpdate() != 1) {
@@ -129,7 +131,7 @@ public class UserServlet extends HttpServlet2 {
             String picturePath = path.resolve(id).toAbsolutePath().toString();
             picture.write(picturePath);
 
-            if (Files.notExists(Paths.get(picturePath))){
+            if (Files.notExists(Paths.get(picturePath))) {
                 throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the picture");
             }
 
@@ -142,9 +144,9 @@ public class UserServlet extends HttpServlet2 {
             jsonb.toJson(userDTO, response.getWriter());
         } catch (SQLException e) {
             throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to register the user", e);
-        }finally{
+        } finally {
             try {
-                if (!connection.getAutoCommit()){
+                if (!connection.getAutoCommit()) {
                     connection.rollback();
                     connection.setAutoCommit(true);
                 }
