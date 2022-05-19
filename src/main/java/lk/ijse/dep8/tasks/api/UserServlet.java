@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
 
-@MultipartConfig
+@MultipartConfig(location = "/tmp", maxFileSize = 10 * 1024 * 1024)
 @WebServlet(name = "UserServlet", value = "/users/*")
 public class UserServlet extends HttpServlet2 {
 
