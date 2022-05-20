@@ -17,7 +17,7 @@ public class TaskListServlet extends HttpServlet2 {
             throw new ResponseStatusException(415, "Invalid content type or content type is empty");
         }
 
-        String pattern = "/users/[A-Fa-f0-9\\-]{36}/lists/?";
+        String pattern = "/[A-Fa-f0-9\\-]{36}/lists/?";
         if (!req.getPathInfo().matches(pattern)){
             throw new ResponseStatusException(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Invalid end point for POST request");
         }
