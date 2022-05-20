@@ -143,7 +143,12 @@ public class TaskListServlet extends HttpServlet2 {
 
         TaskListDTO oldTaskList = getTaskList(req);
         Jsonb jsonb = JsonbBuilder.create();
-        TaskListDTO newTaskList = jsonb.fromJson(req.getReader(), TaskListDTO.class);
+        TaskListDTO newTaskList;
+        try{
+            newTaskList = jsonb.fromJson(req.getReader(), TaskListDTO.class);
+        }catch (JsonbException e){
+            throw new ResponseStatusException(400, "Invalid JSON", e);
+        }
 
         if (newTaskList.getTitle() == null || newTaskList.getTitle().trim().isEmpty()) {
             throw new ResponseStatusException(400, "Invalid title or title is empty");
