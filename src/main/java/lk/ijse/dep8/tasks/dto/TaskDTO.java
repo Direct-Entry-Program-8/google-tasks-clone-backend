@@ -12,6 +12,14 @@ public class TaskDTO implements Serializable {
     public TaskDTO() {
     }
 
+    public TaskDTO(Integer id, String title, Integer position, String notes, String status) {
+        this.id = id;
+        this.title = title;
+        this.position = position;
+        this.notes = notes;
+        this.setStatus(status);
+    }
+
     public TaskDTO(Integer id, String title, Integer position, String notes, Status status) {
         this.id = id;
         this.title = title;
@@ -19,6 +27,7 @@ public class TaskDTO implements Serializable {
         this.notes = notes;
         this.status = status;
     }
+
 
     public Integer getId() {
         return id;
@@ -56,7 +65,11 @@ public class TaskDTO implements Serializable {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(String status) {
+        this.status = status.equals("completed")? Status.COMPLETED: Status.NEEDS_ACTION;
+    }
+
+    public void setStatusAsEnum(Status status) {
         this.status = status;
     }
 
