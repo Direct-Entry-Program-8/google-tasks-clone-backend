@@ -12,21 +12,6 @@ import java.io.IOException;
 public class TaskListServlet extends HttpServlet2 {
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String pathInfo = req.getPathInfo();
-        if (pathInfo == null){
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-        }
-
-        String pattern = "/users/[A-Fa-f0-9\\-]{36}/lists/?.*";
-        if (pathInfo.matches(pattern)){
-            super.service(req, resp);
-        }else{
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-        }
-    }
-
-    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (req.getContentType() == null || !req.getContentType().startsWith("application/json")){
             throw new ResponseStatusException(415, "Invalid content type or content type is empty");

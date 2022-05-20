@@ -24,6 +24,5 @@ public class DispatcherServlet extends HttpServlet2 {
                 super.service(req,resp);
             }
         }
-
     }
 }
