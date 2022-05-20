@@ -151,12 +151,11 @@ public class TaskServlet extends HttpServlet2 {
             stm.setString(3, userId);
             ResultSet rst = stm.executeQuery();
             if (rst.next()) {
-                int id = rst.getInt("id");
                 String title = rst.getString("title");
                 String details = rst.getString("details");
                 int position = rst.getInt("position");
                 String status = rst.getString("status");
-                return new TaskDTO(id, title, position, details, status, taskListId);
+                return new TaskDTO(taskId, title, position, details, status, taskListId);
             } else {
                 throw new ResponseStatusException(404, "Invalid user id or task list id or task id");
             }
