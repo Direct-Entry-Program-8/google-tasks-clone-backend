@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class TaskListDTO implements Serializable {
     private Integer id;
     private String title;
+    private String userId;
 
     public TaskListDTO() {
 
@@ -13,6 +14,12 @@ public class TaskListDTO implements Serializable {
     public TaskListDTO(Integer id, String title) {
         this.id = id;
         this.title = title;
+    }
+
+    public TaskListDTO(Integer id, String title, String userId) {
+        this.id = id;
+        this.title = title;
+        this.userId = userId;
     }
 
     public Integer getId() {
@@ -31,11 +38,20 @@ public class TaskListDTO implements Serializable {
         this.title = title;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     @Override
     public String toString() {
         return "TaskListDTO{" +
-                "id='" + id + '\'' +
+                "id=" + id +
                 ", title='" + title + '\'' +
+                ", userId='" + userId + '\'' +
                 '}';
     }
 }
