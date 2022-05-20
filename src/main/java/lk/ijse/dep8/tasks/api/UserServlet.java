@@ -26,8 +26,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-@MultipartConfig(location = "/tmp", maxFileSize = 10 * 1024 * 1024)
-@WebServlet(name = "UserServlet", urlPatterns = "/users")
+@WebServlet(name = "UserServlet")
 public class UserServlet extends HttpServlet2 {
 
     private final Logger logger = Logger.getLogger(UserServlet.class.getName());
@@ -189,6 +188,8 @@ public class UserServlet extends HttpServlet2 {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         Part picture = request.getPart("picture");
+
+        System.out.println(name);
 
         if (name == null || !name.matches("[A-Za-z ]+")) {
             throw new ResponseStatusException(HttpServletResponse.SC_BAD_REQUEST, "Invalid name or name is empty");
