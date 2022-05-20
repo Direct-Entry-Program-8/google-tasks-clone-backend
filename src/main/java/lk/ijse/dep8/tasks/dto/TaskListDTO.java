@@ -1,10 +1,13 @@
 package lk.ijse.dep8.tasks.dto;
 
+import jakarta.json.bind.annotation.JsonbTransient;
+
 import java.io.Serializable;
 
 public class TaskListDTO implements Serializable {
     private Integer id;
     private String title;
+    @JsonbTransient
     private String userId;
 
     public TaskListDTO() {

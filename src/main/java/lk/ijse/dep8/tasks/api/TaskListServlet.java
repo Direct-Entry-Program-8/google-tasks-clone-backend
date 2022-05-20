@@ -89,4 +89,13 @@ public class TaskListServlet extends HttpServlet2 {
         }
 
     }
+
+    private TaskListDTO getTaskListDTO(){
+
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+    }
 }
