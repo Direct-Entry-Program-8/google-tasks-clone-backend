@@ -189,6 +189,7 @@ public class TaskListServlet extends HttpServlet2 {
                     taskLists.add(new TaskListDTO(id, title, userId));
                 }
 
+                resp.setContentType("application/json");
                 Jsonb jsonb = JsonbBuilder.create();
                 jsonb.toJson(taskLists, resp.getWriter());
 
