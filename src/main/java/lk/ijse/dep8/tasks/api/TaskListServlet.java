@@ -100,12 +100,12 @@ public class TaskListServlet extends HttpServlet2 {
         Matcher matcher = Pattern.compile(pattern).matcher(req.getPathInfo());
         matcher.find();
         String userId = matcher.group(1);
-        String taskListId = matcher.group(2);
+        int taskListId = Integer.parseInt(matcher.group(2));
 
         try (Connection connection = pool.get().getConnection()) {
             PreparedStatement stm = connection.
                     prepareStatement("SELECT * FROM task_list t WHERE t.id=? AND t.user_id=?");
-            stm.setString(1, taskListId);
+            stm.setInt(1, taskListId);
             stm.setString(2, userId);
             ResultSet rst = stm.executeQuery();
             if (rst.next()){
@@ -122,6 +122,16 @@ public class TaskListServlet extends HttpServlet2 {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        TaskListDTO taskList = getTaskList(req);
+        try (Connection connection = pool.get().getConnection()) {
+            PreparedStatement stm = connection.prepareStatement("DELETE FROM task_list WHERE id=?");
+            stm.setInt(1, taskList.getId());
+            if (stm.executeUpdate() != 1){
+                throw new SQLException("Failed to delete the task list");
+            }
+            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        } catch (SQLException e) {
+            throw new ResponseStatusException(500, e.getMessage(), e);
+        }
     }
 }
