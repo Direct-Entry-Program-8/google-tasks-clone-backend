@@ -149,10 +149,10 @@ public class TaskServlet extends HttpServlet2 {
                 String status = rst.getString("status");
                 return new TaskDTO(id, title, position, details, status, taskListId);
             } else {
-                throw new ResponseStatusException(404, "Invalid user id or task list id");
+                throw new ResponseStatusException(404, "Invalid user id or task list id or task id");
             }
         } catch (SQLException e) {
-            throw new ResponseStatusException(500, "Failed to fetch task list details");
+            throw new ResponseStatusException(500, "Failed to fetch task details");
         }
     }
 }
