@@ -73,6 +73,7 @@ public class TaskServlet extends HttpServlet2 {
                 throw new ResponseStatusException(400, "Invalid title or title is empty");
             }
             task.setPosition(0);
+            task.setStatusAsEnum(TaskDTO.Status.NEEDS_ACTION);
 
             connection.setAutoCommit(false);
             pushDown(connection, 0);

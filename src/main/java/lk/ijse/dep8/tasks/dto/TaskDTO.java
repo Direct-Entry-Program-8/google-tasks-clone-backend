@@ -7,7 +7,7 @@ public class TaskDTO implements Serializable {
     private String title;
     private Integer position;
     private String notes;
-    private Status status;
+    private Status status = Status.NEEDS_ACTION;
 
     public TaskDTO() {
     }
@@ -61,8 +61,8 @@ public class TaskDTO implements Serializable {
         this.notes = notes;
     }
 
-    public Status getStatus() {
-        return status;
+    public String getStatus() {
+        return status.toString();
     }
 
     public void setStatus(String status) {
