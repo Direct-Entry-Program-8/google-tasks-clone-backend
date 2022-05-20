@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -53,6 +55,14 @@ public class TaskListServlet extends HttpServlet2 {
         String userId = matcher.group(1);
 
         try (Connection connection = pool.get().getConnection()) {
+            PreparedStatement stm = connection.prepareStatement("SELECT * FROM user WHERE id=?");
+            stm.setString(1, userId);
+            ResultSet rst = stm.executeQuery();
+            if (!rst.next()){
+                throw new ResponseStatusException(404, "Invalid user id");
+            }
+
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
