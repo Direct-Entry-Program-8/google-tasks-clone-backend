@@ -1,5 +1,7 @@
 package lk.ijse.dep8.tasks.dto;
 
+import jakarta.json.bind.annotation.JsonbTransient;
+
 import java.io.Serializable;
 
 public class TaskDTO implements Serializable {
@@ -8,6 +10,8 @@ public class TaskDTO implements Serializable {
     private Integer position;
     private String notes;
     private Status status = Status.NEEDS_ACTION;
+    @JsonbTransient
+    private Integer taskListId;
 
     public TaskDTO() {
     }
@@ -28,6 +32,26 @@ public class TaskDTO implements Serializable {
         this.status = status;
     }
 
+    public TaskDTO(Integer id, String title, Integer position, String notes, String status, Integer taskListId) {
+        this.id = id;
+        this.title = title;
+        this.position = position;
+        this.notes = notes;
+        this.setStatus(status);
+        this.taskListId = taskListId;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Integer getTaskListId() {
+        return taskListId;
+    }
+
+    public void setTaskListId(Integer taskListId) {
+        this.taskListId = taskListId;
+    }
 
     public Integer getId() {
         return id;
