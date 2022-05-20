@@ -19,7 +19,7 @@ public class DispatcherServlet extends HttpServlet2 {
             if (req.getPathInfo().matches("/[A-Fa-f0-9\\-]{36}/?")){
                 getServletContext().getNamedDispatcher("UserServlet").forward(req, resp);
             }else if (req.getPathInfo().matches("/[A-Fa-f0-9\\-]{36}/lists(/\\d+)?/?")){
-                getServletContext().getNamedDispatcher("TaskServlet").forward(req, resp);
+                getServletContext().getNamedDispatcher("TaskListServlet").forward(req, resp);
             }else{
                 super.service(req,resp);
             }
