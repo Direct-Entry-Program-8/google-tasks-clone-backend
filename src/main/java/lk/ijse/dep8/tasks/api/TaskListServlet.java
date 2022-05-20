@@ -1,6 +1,9 @@
 package lk.ijse.dep8.tasks.api;
 
-import javafx.concurrent.Task;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbException;
+import lk.ijse.dep8.tasks.dto.TaskListDTO;
 import lk.ijse.dep8.tasks.util.HttpServlet2;
 import lk.ijse.dep8.tasks.util.ResponseStatusException;
 
@@ -12,11 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.sql.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,13 +57,35 @@ public class TaskListServlet extends HttpServlet2 {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM user WHERE id=?");
             stm.setString(1, userId);
             ResultSet rst = stm.executeQuery();
-            if (!rst.next()){
+            if (!rst.next()) {
                 throw new ResponseStatusException(404, "Invalid user id");
             }
 
+            Jsonb jsonb = JsonbBuilder.create();
+            TaskListDTO taskList = jsonb.fromJson(req.getReader(), TaskListDTO.class);
 
+            if (taskList.getTitle().trim().isEmpty()) {
+                throw new ResponseStatusException(400, "Invalid title or title is empty");
+            }
+
+            stm = connection.prepareStatement("INSERT INTO task_list (name,user_id) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+            stm.setString(1, taskList.getTitle());
+            stm.setString(2, userId);
+            if (stm.executeUpdate() != 1) {
+                throw new SQLException("Failed to save the task list");
+            }
+
+            rst = stm.getGeneratedKeys();
+            rst.next();
+            taskList.setId(rst.getInt(1));
+
+            resp.setContentType("application/json");
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+            jsonb.toJson(taskList, resp.getWriter());
+        } catch (JsonbException e) {
+            throw new ResponseStatusException(400, "Invalid JSON", e);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ResponseStatusException(500, e.getMessage(), e);
         }
 
     }
