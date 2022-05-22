@@ -9,7 +9,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @WebServlet(name = "UserServlet")
@@ -115,10 +115,6 @@ public class UserServlet extends HttpServlet2 {
 
                 Files.deleteIfExists(picturePath);
                 picture.write(picturePath.toAbsolutePath().toString());
-
-                if (Files.notExists(picturePath)) {
-                    throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the picture");
-                }
             } else {
                 Files.deleteIfExists(picturePath);
             }
@@ -129,13 +125,13 @@ public class UserServlet extends HttpServlet2 {
             throw new ResponseStatusException(500, e.getMessage(), e);
         } finally {
             try {
-                if (!connection.getAutoCommit()) {
+                if (connection != null) {
                     connection.rollback();
                     connection.setAutoCommit(true);
+                    connection.close();
                 }
-                connection.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, e.getMessage(), e);
             }
         }
     }
@@ -189,8 +185,6 @@ public class UserServlet extends HttpServlet2 {
         String password = request.getParameter("password");
         Part picture = request.getPart("picture");
 
-        System.out.println(name);
-
         if (name == null || !name.matches("[A-Za-z ]+")) {
             throw new ResponseStatusException(HttpServletResponse.SC_BAD_REQUEST, "Invalid name or name is empty");
         } else if (email == null || !email.matches("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])")) {
@@ -242,10 +236,6 @@ public class UserServlet extends HttpServlet2 {
 
                 String picturePath = path.resolve(id).toAbsolutePath().toString();
                 picture.write(picturePath);
-
-                if (Files.notExists(Paths.get(picturePath))) {
-                    throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the picture");
-                }
             }
 
             connection.commit();
@@ -259,11 +249,13 @@ public class UserServlet extends HttpServlet2 {
             throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to register the user", e);
         } finally {
             try {
-                connection.rollback();
-                connection.setAutoCommit(true);
-                connection.close();
+                if (connection != null) {
+                    connection.rollback();
+                    connection.setAutoCommit(true);
+                    connection.close();
+                }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, e.getMessage(), e);
             }
         }
     }
