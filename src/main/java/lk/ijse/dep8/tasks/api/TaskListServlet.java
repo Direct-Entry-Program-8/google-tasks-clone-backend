@@ -1,10 +1,12 @@
 package lk.ijse.dep8.tasks.api;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbException;
+import jakarta.json.stream.JsonParser;
 import lk.ijse.dep8.tasks.dto.TaskListDTO;
-import lk.ijse.dep8.tasks.dto.TaskListsDTO;
 import lk.ijse.dep8.tasks.util.HttpServlet2;
 import lk.ijse.dep8.tasks.util.ResponseStatusException;
 
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.io.StringReader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -140,9 +143,9 @@ public class TaskListServlet extends HttpServlet2 {
         TaskListDTO oldTaskList = getTaskList(req);
         Jsonb jsonb = JsonbBuilder.create();
         TaskListDTO newTaskList;
-        try{
+        try {
             newTaskList = jsonb.fromJson(req.getReader(), TaskListDTO.class);
-        }catch (JsonbException e){
+        } catch (JsonbException e) {
             throw new ResponseStatusException(400, "Invalid JSON", e);
         }
 
@@ -168,30 +171,36 @@ public class TaskListServlet extends HttpServlet2 {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String pattern = "^/([A-Fa-f0-9\\-]{36})/lists/?$";
         Matcher matcher = Pattern.compile(pattern).matcher(req.getPathInfo());
-        if (matcher.find()){
+        if (matcher.find()) {
             String userId = matcher.group(1);
 
             try (Connection connection = pool.get().getConnection()) {
                 PreparedStatement stm = connection.
                         prepareStatement("SELECT * FROM task_list t WHERE t.user_id=?");
-                stm.setString(1,userId);
+                stm.setString(1, userId);
                 ResultSet rst = stm.executeQuery();
 
                 ArrayList<TaskListDTO> taskLists = new ArrayList<>();
-                while (rst.next()){
+                while (rst.next()) {
                     int id = rst.getInt("id");
                     String title = rst.getString("name");
                     taskLists.add(new TaskListDTO(id, title, userId));
                 }
 
                 resp.setContentType("application/json");
+
                 Jsonb jsonb = JsonbBuilder.create();
-                jsonb.toJson(new TaskListsDTO(taskLists), resp.getWriter());
+                JsonParser parser = Json.createParser(new StringReader(jsonb.toJson(taskLists)));
+                parser.next();
+
+                JsonObject json = Json.createObjectBuilder().add("items", parser.getArray()).build();
+                resp.getWriter().println(json);
+
 
             } catch (SQLException e) {
                 throw new ResponseStatusException(500, e.getMessage(), e);
             }
-        }else{
+        } else {
             TaskListDTO taskList = getTaskList(req);
             Jsonb jsonb = JsonbBuilder.create();
 
