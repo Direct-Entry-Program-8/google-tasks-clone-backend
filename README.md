@@ -6,7 +6,7 @@
 [Task Service API Reference](https://documenter.getpostman.com/view/2805535/Uyxoj56p)
 
 ### Version
-0.4.0
+1.0.0
 
 ### License
 Copyright © 2022 DEP8. All Rights Reserved. <br>
