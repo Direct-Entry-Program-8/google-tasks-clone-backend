@@ -61,11 +61,11 @@ class UserDAOTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"dulanga@ijse.lk", "gihara@ijse.lk", "e5468373-8413-43f8-8484-bcecdbb93e99"})
-    void getUser(String value) throws SQLException {
+    @ValueSource(strings = {"acb","dulanga@ijse.lk", "gihara@ijse.lk", "e5468373-8413-43f8-8484-bcecdbb93e99"})
+    void getUser(/* Given */String value) throws SQLException {
         // When
         UserDTO user = UserDAO.getUser(connection, value);
         // Then
-
+        assertNotNull(user);
     }
 }

@@ -14,8 +14,8 @@ import java.util.UUID;
 
 public class UserService {
 
-    public static boolean existsUser(Connection connection, String email) throws SQLException {
-        return UserDAO.existsUser(connection, email);
+    public static boolean existsUser(Connection connection, String userIdOrEmail) throws SQLException {
+        return UserDAO.existsUser(connection, userIdOrEmail);
     }
 
     public static UserDTO registerUser(Connection connection, Part picture,
@@ -51,16 +51,16 @@ public class UserService {
         }
     }
 
+    public static UserDTO getUser(Connection connection, String userIdOrEmail) throws SQLException {
+        return UserDAO.getUser(connection, userIdOrEmail);
+    }
+
     public static void updateUser(UserDTO user){
 
     }
 
-    public static void deleteUser(String userId){
+    public static void deleteUser(String userId) {
 
-    }
-
-    public static UserDTO getUser(String userId){
-        return null;
     }
 
 }

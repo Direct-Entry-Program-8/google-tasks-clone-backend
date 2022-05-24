@@ -21,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,20 +42,12 @@ public class UserServlet extends HttpServlet2 {
         String userId = req.getPathInfo().replaceAll("/", "");
 
         try (Connection connection = pool.getConnection()) {
-            PreparedStatement stm = connection.prepareStatement("SELECT * FROM user WHERE id=?");
-            stm.setString(1, userId);
-            ResultSet rst = stm.executeQuery();
-
-            if (!rst.next()) {
+            if (!UserService.existsUser(connection, userId)) {
                 throw new ResponseStatusException(404, "Invalid user id");
             } else {
-                String name = rst.getString("full_name");
-                String email = rst.getString("email");
-                String password = rst.getString("password");
-                String picture = rst.getString("profile_pic");
-                return new UserDTO(userId, name, email, password, picture);
+                return UserService.getUser(connection, userId);
             }
-        } catch (SQLException e) {
+        } catch (Throwable e) {
             throw new ResponseStatusException(500, "Failed to fetch the user info", e);
         }
     }
@@ -201,7 +192,7 @@ public class UserServlet extends HttpServlet2 {
             }
 
             String pictureUrl = null;
-            if (picture != null){
+            if (picture != null) {
                 pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
                         + request.getServerPort() + request.getContextPath() + "/uploads/";
             }
@@ -214,7 +205,7 @@ public class UserServlet extends HttpServlet2 {
             response.setContentType("application/json");
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(user, response.getWriter());
-        } catch (SQLException e) {
+        } catch (Throwable e) {
             throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to register the user", e);
         }
     }
