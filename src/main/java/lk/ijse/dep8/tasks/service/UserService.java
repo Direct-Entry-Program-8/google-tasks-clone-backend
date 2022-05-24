@@ -5,14 +5,18 @@ import lk.ijse.dep8.tasks.dto.UserDTO;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.servlet.http.Part;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class UserService {
+
+    private static final Logger logger = Logger.getLogger(UserService.class.getName());
 
     public static boolean existsUser(Connection connection, String userIdOrEmail) throws SQLException {
         return UserDAO.existsUser(connection, userIdOrEmail);
@@ -59,8 +63,18 @@ public class UserService {
 
     }
 
-    public static void deleteUser(String userId) {
+    public static void deleteUser(Connection connection, String userId, String appLocation) throws SQLException {
+        UserDAO.deleteUser(connection, userId);
 
+        new Thread(() -> {
+            Path imagePath = Paths.get(appLocation, "uploads",
+                    userId);
+            try {
+                Files.deleteIfExists(imagePath);
+            } catch (IOException e) {
+                logger.warning("Failed to delete the image: " + imagePath.toAbsolutePath());
+            }
+        }).start();
     }
 
 }
