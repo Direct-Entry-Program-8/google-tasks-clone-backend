@@ -6,7 +6,6 @@ import lk.ijse.dep8.tasks.dto.UserDTO;
 import lk.ijse.dep8.tasks.service.UserService;
 import lk.ijse.dep8.tasks.util.HttpServlet2;
 import lk.ijse.dep8.tasks.util.ResponseStatusException;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -16,13 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @WebServlet(name = "UserServlet")
@@ -72,58 +65,20 @@ public class UserServlet extends HttpServlet2 {
             throw new ResponseStatusException(HttpServletResponse.SC_BAD_REQUEST, "Invalid picture");
         }
 
-        Connection connection = null;
-        try {
-            connection = pool.getConnection();
-//            connection.setAutoCommit(false);
+        try (Connection connection = pool.getConnection()) {
 
-//            PreparedStatement stm = connection.
-//                    prepareStatement("UPDATE user SET full_name=?, password=?, profile_pic=? WHERE id=?");
-//            stm.setString(1, name);
-//            stm.setString(2, DigestUtils.sha256Hex(password));
-//
-//            String pictureUrl = null;
-//            if (picture != null) {
-//                pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
-//                        + request.getServerPort() + request.getContextPath();
-//                pictureUrl += "/uploads/" + user.getId();
-//            }
-//            stm.setString(3, pictureUrl);
-//            stm.setString(4, user.getId());
-//
-//            if (stm.executeUpdate() != 1) {
-//                throw new SQLException("Failed to update the user");
-//            }
-
-            String appLocation = getServletContext().getRealPath("/");
-            Path path = Paths.get(appLocation, "uploads");
-            Path picturePath = path.resolve(user.getId());
-
+            String pictureUrl = null;
             if (picture != null) {
-                if (Files.notExists(path)) {
-                    Files.createDirectory(path);
-                }
-
-                Files.deleteIfExists(picturePath);
-                picture.write(picturePath.toAbsolutePath().toString());
-            } else {
-                Files.deleteIfExists(picturePath);
+                pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
+                        + request.getServerPort() + request.getContextPath();
+                pictureUrl += "/uploads/" + user.getId();
             }
+            UserService.updateUser(connection, new UserDTO(user.getId(), name, user.getEmail(), password, pictureUrl),
+                    picture, getServletContext().getRealPath("/"));
 
-            connection.commit();
             resp.setStatus(204);
-        } catch (SQLException e) {
+        } catch (Throwable e) {
             throw new ResponseStatusException(500, e.getMessage(), e);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                logger.log(Level.SEVERE, e.getMessage(), e);
-            }
         }
     }
 
