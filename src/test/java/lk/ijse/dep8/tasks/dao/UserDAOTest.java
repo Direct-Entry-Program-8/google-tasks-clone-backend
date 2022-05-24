@@ -80,4 +80,18 @@ class UserDAOTest {
         // Then
         assertThrows(AssertionFailedError.class, () -> existsUser(userId));
     }
+
+    @Test
+    void updateUser() throws SQLException {
+        // Given
+        UserDTO givenUser = UserDAO.getUser(connection, "dulanga@ijse.lk");
+        givenUser.setName("Dulanga DEP");
+        givenUser.setPassword("Some Random Password");
+        givenUser.setPicture("Crazy Picture");
+        // When
+        UserDAO.updateUser(connection, givenUser);
+        // Then
+        UserDTO updatedUser = UserDAO.getUser(connection, "dulanga@ijse.lk");
+        assertEquals(givenUser, updatedUser);
+    }
 }

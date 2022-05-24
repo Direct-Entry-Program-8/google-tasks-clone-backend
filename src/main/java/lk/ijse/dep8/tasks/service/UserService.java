@@ -59,10 +59,6 @@ public class UserService {
         return UserDAO.getUser(connection, userIdOrEmail);
     }
 
-    public static void updateUser(UserDTO user){
-
-    }
-
     public static void deleteUser(Connection connection, String userId, String appLocation) throws SQLException {
         UserDAO.deleteUser(connection, userId);
 
@@ -75,6 +71,10 @@ public class UserService {
                 logger.warning("Failed to delete the image: " + imagePath.toAbsolutePath());
             }
         }).start();
+    }
+
+    public static void updateUser(UserDTO user){
+
     }
 
 }

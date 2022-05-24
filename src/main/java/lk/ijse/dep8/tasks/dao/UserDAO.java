@@ -1,6 +1,7 @@
 package lk.ijse.dep8.tasks.dao;
 
 import lk.ijse.dep8.tasks.dto.UserDTO;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,7 +50,15 @@ public class UserDAO {
     }
 
     public static void updateUser(Connection connection, UserDTO user) throws SQLException {
-
+        PreparedStatement stm = connection.
+                prepareStatement("UPDATE user SET full_name=?, password=?, profile_pic=? WHERE id=?");
+        stm.setString(1, user.getName());
+        stm.setString(2, user.getPassword());
+        stm.setString(3, user.getPicture());
+        stm.setString(4, user.getId());
+        if (stm.executeUpdate() != 1){
+            throw new SQLException("Failed to update the user");
+        }
     }
 
     public static void deleteUser(Connection connection, String userId) throws SQLException {
