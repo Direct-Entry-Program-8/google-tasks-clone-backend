@@ -203,7 +203,7 @@ public class UserServlet extends HttpServlet2 {
             String pictureUrl = null;
             if (picture != null){
                 pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
-                        + request.getServerPort() + request.getContextPath();
+                        + request.getServerPort() + request.getContextPath() + "/uploads/";
             }
             UserDTO user = new UserDTO(null, name, email, password, pictureUrl);
 

@@ -26,7 +26,7 @@ public class UserService {
             user.setId(UUID.randomUUID().toString());
 
             if (picture != null) {
-                user.setPicture(user.getPicture() + "/uploads/" + user.getId());
+                user.setPicture(user.getPicture() + user.getId());
             }
             UserDTO savedUser = UserDAO.saveUser(connection, user);
 
