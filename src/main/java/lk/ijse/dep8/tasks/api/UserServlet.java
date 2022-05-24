@@ -131,23 +131,10 @@ public class UserServlet extends HttpServlet2 {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         UserDTO user = getUser(req);
         try (Connection connection = pool.getConnection()) {
-            PreparedStatement stm = connection.prepareStatement("DELETE FROM user WHERE id=?");
-            stm.setString(1, user.getId());
-            if (stm.executeUpdate() != 1) {
-                throw new SQLException("Failed to delete the user");
-            }
+            UserService.deleteUser(connection, user.getId(),
+                    getServletContext().getRealPath("/"));
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-
-            new Thread(() -> {
-                Path imagePath = Paths.get(getServletContext().getRealPath("/"), "uploads",
-                        user.getId());
-                try {
-                    Files.deleteIfExists(imagePath);
-                } catch (IOException e) {
-                    logger.warning("Failed to delete the image: " + imagePath.toAbsolutePath());
-                }
-            }).start();
-        } catch (SQLException e) {
+        } catch (Throwable e) {
             throw new ResponseStatusException(500, e.getMessage(), e);
         }
     }
