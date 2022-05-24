@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class UserDAO {
 
-    public static UserDTO getUser(Connection connection, String emailOrId) throws SQLException {
+    public  UserDTO getUser(Connection connection, String emailOrId) throws SQLException {
         PreparedStatement stm = connection.
                 prepareStatement("SELECT * FROM user WHERE email = ? OR id = ?");
         stm.setString(1, emailOrId);
@@ -27,7 +27,7 @@ public class UserDAO {
         }
     }
 
-    public static boolean existsUser(Connection connection, String emailOrId) throws SQLException {
+    public  boolean existsUser(Connection connection, String emailOrId) throws SQLException {
         PreparedStatement stm = connection.
                 prepareStatement("SELECT id FROM user WHERE email = ? OR id = ?");
         stm.setString(1, emailOrId);
@@ -35,7 +35,7 @@ public class UserDAO {
         return (stm.executeQuery().next());
     }
 
-    public static UserDTO saveUser(Connection connection, UserDTO user) throws SQLException {
+    public  UserDTO saveUser(Connection connection, UserDTO user) throws SQLException {
         PreparedStatement stm = connection.
                 prepareStatement("INSERT INTO user (id, email, password, full_name, profile_pic) VALUES (?, ?, ?, ?, ?)");
         stm.setString(1, user.getId());
@@ -49,7 +49,7 @@ public class UserDAO {
         return user;
     }
 
-    public static void updateUser(Connection connection, UserDTO user) throws SQLException {
+    public  void updateUser(Connection connection, UserDTO user) throws SQLException {
         PreparedStatement stm = connection.
                 prepareStatement("UPDATE user SET full_name=?, password=?, profile_pic=? WHERE id=?");
         stm.setString(1, user.getName());
@@ -61,7 +61,7 @@ public class UserDAO {
         }
     }
 
-    public static void deleteUser(Connection connection, String userId) throws SQLException {
+    public  void deleteUser(Connection connection, String userId) throws SQLException {
         PreparedStatement stm = connection.prepareStatement("DELETE FROM user WHERE id=?");
         stm.setString(1, userId);
         if (stm.executeUpdate() != 1){

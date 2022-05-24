@@ -35,10 +35,10 @@ public class UserServlet extends HttpServlet2 {
         String userId = req.getPathInfo().replaceAll("/", "");
 
         try (Connection connection = pool.getConnection()) {
-            if (!UserService.existsUser(connection, userId)) {
+            if (!new UserService().existsUser(connection, userId)) {
                 throw new ResponseStatusException(404, "Invalid user id");
             } else {
-                return UserService.getUser(connection, userId);
+                return new UserService().getUser(connection, userId);
             }
         }catch (ResponseStatusException e){
             throw e;
@@ -75,7 +75,7 @@ public class UserServlet extends HttpServlet2 {
                         + request.getServerPort() + request.getContextPath();
                 pictureUrl += "/uploads/" + user.getId();
             }
-            UserService.updateUser(connection, new UserDTO(user.getId(), name, user.getEmail(), password, pictureUrl),
+            new UserService().updateUser(connection, new UserDTO(user.getId(), name, user.getEmail(), password, pictureUrl),
                     picture, getServletContext().getRealPath("/"));
 
             resp.setStatus(204);
@@ -90,7 +90,7 @@ public class UserServlet extends HttpServlet2 {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         UserDTO user = getUser(req);
         try (Connection connection = pool.getConnection()) {
-            UserService.deleteUser(connection, user.getId(),
+            new UserService().deleteUser(connection, user.getId(),
                     getServletContext().getRealPath("/"));
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         }catch (ResponseStatusException e){
@@ -135,7 +135,7 @@ public class UserServlet extends HttpServlet2 {
         }
 
         try (Connection connection = pool.getConnection()) {
-            if (UserService.existsUser(connection, email)) {
+            if (new UserService().existsUser(connection, email)) {
                 throw new ResponseStatusException(HttpServletResponse.SC_CONFLICT, "A user has been already registered with this email");
             }
 
@@ -146,7 +146,7 @@ public class UserServlet extends HttpServlet2 {
             }
             UserDTO user = new UserDTO(null, name, email, password, pictureUrl);
 
-            user = UserService.registerUser(connection, picture,
+            user = new UserService().registerUser(connection, picture,
                     getServletContext().getRealPath("/"), user);
 
             response.setStatus(HttpServletResponse.SC_CREATED);
