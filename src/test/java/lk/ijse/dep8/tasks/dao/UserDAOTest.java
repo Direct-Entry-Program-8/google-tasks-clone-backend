@@ -44,7 +44,7 @@ class UserDAOTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"dulanga@ijse.lk", "gihara@ijse.lk", "e5468373-8413-43f8-8484-bcecdbb93e99"})
+    @ValueSource(strings = {"chamma@ijse.lk","dulanga@ijse.lk", "gihara@ijse.lk", "e5468373-8413-43f8-8484-bcecdbb93e99"})
     void existsUser(String arg) throws SQLException {
         boolean result = UserDAO.existsUser(connection, arg);
         assertTrue(result);

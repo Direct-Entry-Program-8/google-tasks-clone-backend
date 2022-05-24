@@ -40,6 +40,8 @@ public class UserServlet extends HttpServlet2 {
             } else {
                 return UserService.getUser(connection, userId);
             }
+        }catch (ResponseStatusException e){
+            throw e;
         } catch (Throwable e) {
             throw new ResponseStatusException(500, "Failed to fetch the user info", e);
         }
@@ -77,6 +79,8 @@ public class UserServlet extends HttpServlet2 {
                     picture, getServletContext().getRealPath("/"));
 
             resp.setStatus(204);
+        }catch (ResponseStatusException e){
+            throw e;
         } catch (Throwable e) {
             throw new ResponseStatusException(500, e.getMessage(), e);
         }
@@ -89,6 +93,8 @@ public class UserServlet extends HttpServlet2 {
             UserService.deleteUser(connection, user.getId(),
                     getServletContext().getRealPath("/"));
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        }catch (ResponseStatusException e){
+                throw e;
         } catch (Throwable e) {
             throw new ResponseStatusException(500, e.getMessage(), e);
         }
@@ -147,6 +153,8 @@ public class UserServlet extends HttpServlet2 {
             response.setContentType("application/json");
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(user, response.getWriter());
+        }catch (ResponseStatusException e){
+            throw e;
         } catch (Throwable e) {
             throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to register the user", e);
         }
