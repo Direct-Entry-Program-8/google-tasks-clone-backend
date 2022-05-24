@@ -18,6 +18,7 @@ class UserDAOTest {
 
     @BeforeEach
     void setUp() {
+        System.out.println("Before");
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dep8_tasks", "root", "mysql");
@@ -29,6 +30,7 @@ class UserDAOTest {
 
     @AfterEach
     void tearDown() {
+        System.out.println("After");
         try {
             connection.rollback();
             connection.setAutoCommit(true);

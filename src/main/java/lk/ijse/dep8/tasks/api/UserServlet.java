@@ -200,10 +200,14 @@ public class UserServlet extends HttpServlet2 {
                 throw new ResponseStatusException(HttpServletResponse.SC_CONFLICT, "A user has been already registered with this email");
             }
 
-            UserDTO user = new UserDTO(null, name, email, password, null);
-            String pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
-                    + request.getServerPort() + request.getContextPath();
-            user = UserService.registerUser(connection, picture, pictureUrl,
+            String pictureUrl = null;
+            if (picture != null){
+                pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
+                        + request.getServerPort() + request.getContextPath();
+            }
+            UserDTO user = new UserDTO(null, name, email, password, pictureUrl);
+
+            user = UserService.registerUser(connection, picture,
                     getServletContext().getRealPath("/"), user);
 
             response.setStatus(HttpServletResponse.SC_CREATED);

@@ -18,7 +18,7 @@ public class UserService {
         return UserDAO.existsUser(connection, email);
     }
 
-    public static UserDTO registerUser(Connection connection, Part picture, String pictureUrl,
+    public static UserDTO registerUser(Connection connection, Part picture,
                                        String appLocation,
                                        UserDTO user) throws SQLException{
         try {
@@ -26,9 +26,8 @@ public class UserService {
             user.setId(UUID.randomUUID().toString());
 
             if (picture != null) {
-                pictureUrl += "/uploads/" + user.getId();
+                user.setPicture(user.getPicture() + "/uploads/" + user.getId());
             }
-            user.setPicture(pictureUrl);
             UserDTO savedUser = UserDAO.saveUser(connection, user);
 
             if (picture != null) {
