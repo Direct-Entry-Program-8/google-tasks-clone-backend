@@ -2,9 +2,9 @@ package lk.ijse.dep8.tasks.service;
 
 import lk.ijse.dep8.tasks.dao.UserDAO;
 import lk.ijse.dep8.tasks.dto.UserDTO;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.servlet.http.Part;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,6 +28,7 @@ public class UserService {
             if (picture != null) {
                 user.setPicture(user.getPicture() + user.getId());
             }
+            user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
             UserDTO savedUser = UserDAO.saveUser(connection, user);
 
             if (picture != null) {

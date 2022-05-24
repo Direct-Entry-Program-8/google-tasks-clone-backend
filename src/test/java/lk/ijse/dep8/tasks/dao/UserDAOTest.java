@@ -4,6 +4,8 @@ import lk.ijse.dep8.tasks.dto.UserDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -40,9 +42,10 @@ class UserDAOTest {
         }
     }
 
-    @Test
-    void existsUser() throws SQLException {
-        boolean result = UserDAO.existsUser(connection, "dulanga@ijse.lk");
+    @ParameterizedTest
+    @ValueSource(strings = {"dulanga@ijse.lk", "gihara@ijse.lk", "e5468373-8413-43f8-8484-bcecdbb93e99"})
+    void existsUser(String arg) throws SQLException {
+        boolean result = UserDAO.existsUser(connection, arg);
         assertTrue(result);
     }
 
@@ -55,5 +58,14 @@ class UserDAOTest {
         boolean result = UserDAO.existsUser(connection, savedUser.getEmail());
         assertTrue(result);
         assertEquals(givenUser, savedUser);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"dulanga@ijse.lk", "gihara@ijse.lk", "e5468373-8413-43f8-8484-bcecdbb93e99"})
+    void getUser(String value) throws SQLException {
+        // When
+        UserDTO user = UserDAO.getUser(connection, value);
+        // Then
+
     }
 }
