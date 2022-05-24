@@ -45,8 +45,9 @@ public class UserService {
             return savedUser;
         }catch (Throwable t){
             connection.rollback();
-            connection.setAutoCommit(true);
             throw new RuntimeException(t);
+        }finally{
+            connection.setAutoCommit(true);
         }
     }
 
