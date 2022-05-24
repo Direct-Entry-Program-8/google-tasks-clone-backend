@@ -75,25 +75,25 @@ public class UserServlet extends HttpServlet2 {
         Connection connection = null;
         try {
             connection = pool.getConnection();
-            connection.setAutoCommit(false);
+//            connection.setAutoCommit(false);
 
-            PreparedStatement stm = connection.
-                    prepareStatement("UPDATE user SET full_name=?, password=?, profile_pic=? WHERE id=?");
-            stm.setString(1, name);
-            stm.setString(2, DigestUtils.sha256Hex(password));
-
-            String pictureUrl = null;
-            if (picture != null) {
-                pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
-                        + request.getServerPort() + request.getContextPath();
-                pictureUrl += "/uploads/" + user.getId();
-            }
-            stm.setString(3, pictureUrl);
-            stm.setString(4, user.getId());
-
-            if (stm.executeUpdate() != 1) {
-                throw new SQLException("Failed to update the user");
-            }
+//            PreparedStatement stm = connection.
+//                    prepareStatement("UPDATE user SET full_name=?, password=?, profile_pic=? WHERE id=?");
+//            stm.setString(1, name);
+//            stm.setString(2, DigestUtils.sha256Hex(password));
+//
+//            String pictureUrl = null;
+//            if (picture != null) {
+//                pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
+//                        + request.getServerPort() + request.getContextPath();
+//                pictureUrl += "/uploads/" + user.getId();
+//            }
+//            stm.setString(3, pictureUrl);
+//            stm.setString(4, user.getId());
+//
+//            if (stm.executeUpdate() != 1) {
+//                throw new SQLException("Failed to update the user");
+//            }
 
             String appLocation = getServletContext().getRealPath("/");
             Path path = Paths.get(appLocation, "uploads");
