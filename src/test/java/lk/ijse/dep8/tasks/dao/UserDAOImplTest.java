@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserDAOImplTest {
 
     private static Connection connection;
-    private static UserDAOImpl userDAOImpl;
+    private static UserDAO userDAOImpl;
 
     @BeforeAll
     static void setUp() {
@@ -61,7 +61,7 @@ class UserDAOImplTest {
     @ParameterizedTest
     void saveUser(User givenUser) {
         // when
-        User savedUser = userDAOImpl.saveUser(givenUser);
+        User savedUser = userDAOImpl.save(givenUser);
 
         // then
         assertEquals(givenUser, savedUser);
@@ -73,7 +73,7 @@ class UserDAOImplTest {
     @ParameterizedTest
     void existsUserById(String givenUserId) {
         // when
-        boolean result = userDAOImpl.existsUserById(givenUserId);
+        boolean result = userDAOImpl.existsById(givenUserId);
 
         // then
         if (givenUserId.equals("U100")) {
@@ -88,7 +88,7 @@ class UserDAOImplTest {
     @ParameterizedTest
     void findUserById(String givenUserId) {
         // when
-        Optional<User> userWrapper = userDAOImpl.findUserById(givenUserId);
+        Optional<User> userWrapper = userDAOImpl.findById(givenUserId);
 
         // then
         if (givenUserId.equals("U100")) {
@@ -102,7 +102,7 @@ class UserDAOImplTest {
     @Test
     void findAllUsers() {
         // when
-        List<User> allUsers = userDAOImpl.findAllUsers();
+        List<User> allUsers = userDAOImpl.findAll();
 
         // then
         assertTrue(allUsers.size() >= 5);
@@ -114,12 +114,12 @@ class UserDAOImplTest {
     void deleteUserById(String givenUserId) {
         // when
         if (givenUserId.equals("U100")) {
-            assertThrows(DataAccessException.class, () -> userDAOImpl.deleteUserById(givenUserId));
+            assertThrows(DataAccessException.class, () -> userDAOImpl.deleteById(givenUserId));
         } else {
-            userDAOImpl.deleteUserById(givenUserId);
+            userDAOImpl.deleteById(givenUserId);
         }
 
-        assertFalse(userDAOImpl.existsUserById(givenUserId));
+        assertFalse(userDAOImpl.existsById(givenUserId));
     }
 
     @Order(6)
@@ -128,7 +128,7 @@ class UserDAOImplTest {
         // given
         long count = 5;
         // when
-        long result = userDAOImpl.countUsers();
+        long result = userDAOImpl.count();
         // then
         assertTrue(result >= 5);
     }

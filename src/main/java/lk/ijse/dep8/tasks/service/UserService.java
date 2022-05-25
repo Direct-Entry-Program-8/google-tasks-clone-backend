@@ -1,5 +1,6 @@
 package lk.ijse.dep8.tasks.service;
 
+import lk.ijse.dep8.tasks.dao.DAOFactory;
 import lk.ijse.dep8.tasks.dao.UserDAO;
 import lk.ijse.dep8.tasks.dao.impl.UserDAOImpl;
 import lk.ijse.dep8.tasks.dto.UserDTO;
@@ -22,7 +23,7 @@ public class UserService {
     private final Logger logger = Logger.getLogger(UserService.class.getName());
 
     public boolean existsUser(Connection connection, String userIdOrEmail) throws SQLException {
-        UserDAO userDAO = new UserDAOImpl(connection);
+        UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
         return userDAO.existsUserByEmailOrId(userIdOrEmail);
     }
 
@@ -38,7 +39,7 @@ public class UserService {
             }
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAO userDAO = new UserDAOImpl(connection);
+            UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
             // DTO -> Entity
             User userEntity = new User(user.getId(), user.getEmail(), user.getPassword(), user.getName(), user.getPicture());
             User savedUser = userDAO.save(userEntity);
@@ -67,14 +68,14 @@ public class UserService {
     }
 
     public UserDTO getUser(Connection connection, String userIdOrEmail) throws SQLException {
-        UserDAO userDAO = new UserDAOImpl(connection);
+        UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
         Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
         return userWrapper.map(e -> new UserDTO(e.getId(), e.getFullName(), e.getEmail(),
                 e.getPassword(), e.getProfilePic())).orElse(null);
     }
 
     public void deleteUser(Connection connection, String userId, String appLocation) throws SQLException {
-        UserDAO userDAO = new UserDAOImpl(connection);
+        UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
         userDAO.deleteById(userId);
 
         new Thread(() -> {
@@ -95,7 +96,7 @@ public class UserService {
 
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAO userDAO = new UserDAOImpl(connection);
+            UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
 
             // Fetch the current user
             User userEntity = userDAO.findById(user.getId()).get();
