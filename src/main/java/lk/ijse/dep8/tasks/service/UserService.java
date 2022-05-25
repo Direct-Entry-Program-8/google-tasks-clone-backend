@@ -1,7 +1,9 @@
 package lk.ijse.dep8.tasks.service;
 
 import lk.ijse.dep8.tasks.dao.OldUserDAO;
+import lk.ijse.dep8.tasks.dao.UserDAO;
 import lk.ijse.dep8.tasks.dto.UserDTO;
+import lk.ijse.dep8.tasks.entity.User;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.servlet.http.Part;
@@ -19,7 +21,8 @@ public class UserService {
     private  final Logger logger = Logger.getLogger(UserService.class.getName());
 
     public  boolean existsUser(Connection connection, String userIdOrEmail) throws SQLException {
-        return new OldUserDAO().existsUser(connection, userIdOrEmail);
+        UserDAO userDAO = new UserDAO(connection);
+        return userDAO.existsUserByEmailOrId(userIdOrEmail);
     }
 
     public  UserDTO registerUser(Connection connection, Part picture,
@@ -33,7 +36,12 @@ public class UserService {
                 user.setPicture(user.getPicture() + user.getId());
             }
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
-            UserDTO savedUser = new OldUserDAO().saveUser(connection, user);
+
+            UserDAO userDAO = new UserDAO(connection);
+            User userEntity = new User(user.getId(), user.getEmail(), user.getPassword(), user.getName(), user.getPicture());
+            User savedUser = userDAO.saveUser(userEntity);
+            user = new UserDTO(savedUser.getId(), savedUser.getFullName(), savedUser.getEmail(),
+                    savedUser.getPassword(), savedUser.getProfilePic());
 
             if (picture != null) {
                 Path path = Paths.get(appLocation, "uploads");
@@ -46,7 +54,7 @@ public class UserService {
             }
 
             connection.commit();
-            return savedUser;
+            return user;
         }catch (Throwable t){
             connection.rollback();
             throw new RuntimeException(t);

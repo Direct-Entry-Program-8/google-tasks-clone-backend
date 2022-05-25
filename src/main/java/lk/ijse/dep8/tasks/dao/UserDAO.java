@@ -26,6 +26,17 @@ public class UserDAO {
         }
     }
 
+    public boolean existsUserByEmailOrId(String emailOrId){
+        try {
+            PreparedStatement stm = connection.prepareStatement("SELECT id FROM user WHERE id=? OR email=?");
+            stm.setString(1, emailOrId);
+            stm.setString(2, emailOrId);
+            return stm.executeQuery().next();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public User saveUser(User user) {
         try {
             if (!existsUserById(user.getId())) {

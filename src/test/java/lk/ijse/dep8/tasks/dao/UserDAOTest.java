@@ -124,6 +124,11 @@ class UserDAOTest {
     @Order(6)
     @Test
     void countUsers() {
-        assertTrue(userDAO.countUsers() >= 5);
+        // given
+        long count = 5;
+        // when
+        long result = userDAO.countUsers();
+        // then
+        assertTrue(result >= 5);
     }
 }
