@@ -89,13 +89,13 @@ public class TaskListDAO {
         try {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM task_list");
-            List<TaskList> users = new ArrayList<>();
+            List<TaskList> taskLists = new ArrayList<>();
             while (rst.next()) {
-                users.add(new TaskList(rst.getInt("id"),
+                taskLists.add(new TaskList(rst.getInt("id"),
                         rst.getString("name"),
                         rst.getString("user_id")));
             }
-            return users;
+            return taskLists;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
