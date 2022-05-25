@@ -1,9 +1,8 @@
-package lk.ijse.dep8.tasks.dao.impl;
+package lk.ijse.dep8.tasks.dao.custom.impl;
 
-import lk.ijse.dep8.tasks.dao.TaskListDAO;
+import lk.ijse.dep8.tasks.dao.custom.TaskListDAO;
 import lk.ijse.dep8.tasks.dao.exception.DataAccessException;
 import lk.ijse.dep8.tasks.entity.TaskList;
-import lk.ijse.dep8.tasks.entity.User;
 
 import java.sql.*;
 import java.util.ArrayList;

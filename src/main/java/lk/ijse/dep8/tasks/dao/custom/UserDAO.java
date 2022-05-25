@@ -1,5 +1,6 @@
-package lk.ijse.dep8.tasks.dao;
+package lk.ijse.dep8.tasks.dao.custom;
 
+import lk.ijse.dep8.tasks.dao.CrudDAO;
 import lk.ijse.dep8.tasks.entity.User;
 
 import java.util.Optional;
