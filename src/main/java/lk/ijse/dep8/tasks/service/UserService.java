@@ -41,7 +41,7 @@ public class UserService {
             UserDAO userDAO = new UserDAOImpl(connection);
             // DTO -> Entity
             User userEntity = new User(user.getId(), user.getEmail(), user.getPassword(), user.getName(), user.getPicture());
-            User savedUser = userDAO.saveUser(userEntity);
+            User savedUser = userDAO.save(userEntity);
             // Entity -> DTO
             user = new UserDTO(savedUser.getId(), savedUser.getFullName(), savedUser.getEmail(),
                     savedUser.getPassword(), savedUser.getProfilePic());
@@ -75,7 +75,7 @@ public class UserService {
 
     public void deleteUser(Connection connection, String userId, String appLocation) throws SQLException {
         UserDAO userDAO = new UserDAOImpl(connection);
-        userDAO.deleteUserById(userId);
+        userDAO.deleteById(userId);
 
         new Thread(() -> {
             Path imagePath = Paths.get(appLocation, "uploads",
@@ -98,13 +98,13 @@ public class UserService {
             UserDAO userDAO = new UserDAOImpl(connection);
 
             // Fetch the current user
-            User userEntity = userDAO.findUserById(user.getId()).get();
+            User userEntity = userDAO.findById(user.getId()).get();
 
             userEntity.setPassword(user.getPassword());
             userEntity.setFullName(user.getName());
             userEntity.setProfilePic(user.getPicture());
 
-            userDAO.saveUser(userEntity);
+            userDAO.save(userEntity);
 
             Path path = Paths.get(appLocation, "uploads");
             Path picturePath = path.resolve(user.getId());
