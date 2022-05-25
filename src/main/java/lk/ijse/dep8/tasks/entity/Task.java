@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Task implements Serializable {
+public class Task implements SuperEntity {
     private int id;
     private String title;
     private String details;

@@ -18,19 +18,22 @@ public class TaskListDAOImpl implements TaskListDAO {
         this.connection = connection;
     }
 
-    public boolean existsTaskListById(int listId) {
+    @Override
+    public boolean existsById(Object listId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT id FROM task_list WHERE id=?");
-            stm.setInt(1, listId);
+            stm.setInt(1, (int) listId);
             return stm.executeQuery().next();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public TaskList saveTaskList(TaskList taskList) {
+    @Override
+    public Object save(Object entity) {
+        TaskList taskList = (TaskList) entity;
         try {
-            if (!existsTaskListById(taskList.getId())) {
+            if (!existsById(taskList.getId())) {
                 PreparedStatement stm = connection.
                         prepareStatement("INSERT INTO task_list (name, user_id) VALUES (?, ?, ?)");
                 stm.setString(1, taskList.getName());
@@ -54,7 +57,8 @@ public class TaskListDAOImpl implements TaskListDAO {
         }
     }
 
-    public void deleteTaskListById(int listId) {
+    @Override
+    public void deleteById(Object listId) {
         try {
             if (!existsTaskListById(listId)){
                 throw new DataAccessException("No task list found");
@@ -69,7 +73,8 @@ public class TaskListDAOImpl implements TaskListDAO {
         }
     }
 
-    public Optional<TaskList> findTaskListById(int listId) {
+    @Override
+    public Optional<Object> findById(Object listId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM task_list WHERE id=?");
             stm.setInt(1, listId);
@@ -86,7 +91,8 @@ public class TaskListDAOImpl implements TaskListDAO {
         }
     }
 
-    public List<TaskList> findAllTaskList() {
+    @Override
+    public List<Object> findAll() {
         try {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM task_list");
@@ -102,7 +108,8 @@ public class TaskListDAOImpl implements TaskListDAO {
         }
     }
 
-    public long countTaskLists() {
+    @Override
+    public long count() {
         try {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT COUNT(id) AS count FROM task_list");

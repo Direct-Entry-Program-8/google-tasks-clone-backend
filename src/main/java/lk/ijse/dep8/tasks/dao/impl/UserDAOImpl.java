@@ -17,10 +17,11 @@ public class UserDAOImpl implements UserDAO {
         this.connection = connection;
     }
 
-    public boolean existsUserById(String userId) {
+    @Override
+    public boolean existsById(Object userId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT id FROM user WHERE id=?");
-            stm.setString(1, userId);
+            stm.setString(1, (String) userId);
             return stm.executeQuery().next();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -38,9 +39,11 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
-    public User saveUser(User user) {
+    @Override
+    public Object save(Object entity) {
+        User user = (User) entity;
         try {
-            if (!existsUserById(user.getId())) {
+            if (!existsById(user.getId())) {
                 PreparedStatement stm = connection.
                         prepareStatement("INSERT INTO user (id, email, password, full_name, profile_pic) VALUES (?, ?, ?, ?, ?)");
                 stm.setString(1, user.getId());
@@ -69,13 +72,14 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
-    public void deleteUserById(String userId) {
+    @Override
+    public void deleteById(Object userId) {
         try {
-            if (!existsUserById(userId)){
+            if (!existsById(userId)){
                 throw new DataAccessException("No user found");
             }
             PreparedStatement stm = connection.prepareStatement("DELETE FROM user WHERE id=?");
-            stm.setString(1, userId);
+            stm.setString(1, (String) userId);
             if (stm.executeUpdate() != 1) {
                 throw new SQLException("Failed to delete the user");
             }
@@ -84,10 +88,11 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
-    public Optional<User> findUserById(String userId) {
+    @Override
+    public Optional<Object> findById(Object userId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM user WHERE id=?");
-            stm.setString(1, userId);
+            stm.setString(1, (String) userId);
             ResultSet rst = stm.executeQuery();
             if (rst.next()){
                 return Optional.of(new User(rst.getString("id"),
@@ -124,11 +129,12 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
-    public List<User> findAllUsers() {
+    @Override
+    public List<Object> findAll() {
         try {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM user");
-            List<User> users = new ArrayList<>();
+            List<Object> users = new ArrayList<>();
             while (rst.next()) {
                 users.add(new User(rst.getString("id"),
                         rst.getString("email"),
@@ -142,7 +148,8 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
-    public long countUsers() {
+    @Override
+    public long count() {
         try {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT COUNT(id) AS count FROM user");

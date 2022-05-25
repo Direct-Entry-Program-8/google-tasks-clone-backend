@@ -18,7 +18,8 @@ public class TaskDAOImpl implements TaskDAO {
         this.connection = connection;
     }
 
-    public boolean existsTaskById(int taskId) {
+    @Override
+    public boolean existsById(Object taskId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT id FROM task WHERE id=?");
             stm.setInt(1, taskId);
@@ -28,7 +29,8 @@ public class TaskDAOImpl implements TaskDAO {
         }
     }
 
-    public Task saveTask(Task task) {
+    @Override
+    public Object save(Object task) {
         try {
             if (!existsTaskById(task.getId())) {
                 PreparedStatement stm = connection.
@@ -60,7 +62,8 @@ public class TaskDAOImpl implements TaskDAO {
         }
     }
 
-    public void deleteTaskById(int taskId) {
+    @Override
+    public void deleteById(Object taskId) {
         try {
             if (!existsTaskById(taskId)){
                 throw new DataAccessException("No task found");
@@ -75,7 +78,8 @@ public class TaskDAOImpl implements TaskDAO {
         }
     }
 
-    public Optional<Task> findTaskById(int taskId) {
+    @Override
+    public Optional<Object> findById(Object taskId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM task WHERE id=?");
             stm.setInt(1, taskId);
@@ -95,7 +99,8 @@ public class TaskDAOImpl implements TaskDAO {
         }
     }
 
-    public List<Task> findAllTasks() {
+    @Override
+    public List<Object> findAll() {
         try {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM task");
@@ -114,7 +119,8 @@ public class TaskDAOImpl implements TaskDAO {
         }
     }
 
-    public long countTasks() {
+    @Override
+    public long count() {
         try {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT COUNT(id) AS count FROM user");
