@@ -6,9 +6,10 @@ import java.sql.Connection;
 
 public class QueryDAOImpl implements QueryDAO {
 
-    private Connection connection;
+    private final Connection connection;
 
     public QueryDAOImpl(Connection connection) {
         this.connection = connection;
     }
+
 }

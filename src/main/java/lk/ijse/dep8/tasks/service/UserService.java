@@ -23,7 +23,7 @@ public class UserService {
     private final Logger logger = Logger.getLogger(UserService.class.getName());
 
     public boolean existsUser(Connection connection, String userIdOrEmail) throws SQLException {
-        UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
+        UserDAO userDAO = DAOFactory.getInstance().getDAO(connection, DAOFactory.DAOTypes.USER);
         return userDAO.existsUserByEmailOrId(userIdOrEmail);
     }
 
@@ -39,7 +39,7 @@ public class UserService {
             }
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
+            UserDAO userDAO =  DAOFactory.getInstance().getDAO(connection, DAOFactory.DAOTypes.USER);
             // DTO -> Entity
             User userEntity = new User(user.getId(), user.getEmail(), user.getPassword(), user.getName(), user.getPicture());
             User savedUser = userDAO.save(userEntity);
@@ -68,14 +68,14 @@ public class UserService {
     }
 
     public UserDTO getUser(Connection connection, String userIdOrEmail) throws SQLException {
-        UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
+        UserDAO userDAO =  DAOFactory.getInstance().getDAO(connection, DAOFactory.DAOTypes.USER);
         Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
         return userWrapper.map(e -> new UserDTO(e.getId(), e.getFullName(), e.getEmail(),
                 e.getPassword(), e.getProfilePic())).orElse(null);
     }
 
     public void deleteUser(Connection connection, String userId, String appLocation) throws SQLException {
-        UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
+        UserDAO userDAO =  DAOFactory.getInstance().getDAO(connection, DAOFactory.DAOTypes.USER);
         userDAO.deleteById(userId);
 
         new Thread(() -> {
@@ -96,7 +96,7 @@ public class UserService {
 
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAO userDAO = DAOFactory.getInstance().getUserDAO(connection);
+            UserDAO userDAO =  DAOFactory.getInstance().getDAO(connection, DAOFactory.DAOTypes.USER);
 
             // Fetch the current user
             User userEntity = userDAO.findById(user.getId()).get();
