@@ -1,5 +1,6 @@
 package lk.ijse.dep8.tasks.service;
 
+import lk.ijse.dep8.tasks.dao.UserDAO;
 import lk.ijse.dep8.tasks.dao.impl.UserDAOImpl;
 import lk.ijse.dep8.tasks.dto.UserDTO;
 import lk.ijse.dep8.tasks.entity.User;
@@ -21,8 +22,8 @@ public class UserService {
     private final Logger logger = Logger.getLogger(UserService.class.getName());
 
     public boolean existsUser(Connection connection, String userIdOrEmail) throws SQLException {
-        UserDAOImpl userDAOImpl = new UserDAOImpl(connection);
-        return userDAOImpl.existsUserByEmailOrId(userIdOrEmail);
+        UserDAO userDAO = new UserDAOImpl(connection);
+        return userDAO.existsUserByEmailOrId(userIdOrEmail);
     }
 
     public UserDTO registerUser(Connection connection, Part picture,
@@ -37,10 +38,10 @@ public class UserService {
             }
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAOImpl userDAOImpl = new UserDAOImpl(connection);
+            UserDAO userDAO = new UserDAOImpl(connection);
             // DTO -> Entity
             User userEntity = new User(user.getId(), user.getEmail(), user.getPassword(), user.getName(), user.getPicture());
-            User savedUser = userDAOImpl.saveUser(userEntity);
+            User savedUser = userDAO.saveUser(userEntity);
             // Entity -> DTO
             user = new UserDTO(savedUser.getId(), savedUser.getFullName(), savedUser.getEmail(),
                     savedUser.getPassword(), savedUser.getProfilePic());
@@ -66,15 +67,15 @@ public class UserService {
     }
 
     public UserDTO getUser(Connection connection, String userIdOrEmail) throws SQLException {
-        UserDAOImpl userDAOImpl = new UserDAOImpl(connection);
-        Optional<User> userWrapper = userDAOImpl.findUserByIdOrEmail(userIdOrEmail);
+        UserDAO userDAO = new UserDAOImpl(connection);
+        Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
         return userWrapper.map(e -> new UserDTO(e.getId(), e.getFullName(), e.getEmail(),
                 e.getPassword(), e.getProfilePic())).orElse(null);
     }
 
     public void deleteUser(Connection connection, String userId, String appLocation) throws SQLException {
-        UserDAOImpl userDAOImpl = new UserDAOImpl(connection);
-        userDAOImpl.deleteUserById(userId);
+        UserDAO userDAO = new UserDAOImpl(connection);
+        userDAO.deleteUserById(userId);
 
         new Thread(() -> {
             Path imagePath = Paths.get(appLocation, "uploads",
@@ -94,16 +95,16 @@ public class UserService {
 
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAOImpl userDAOImpl = new UserDAOImpl(connection);
+            UserDAO userDAO = new UserDAOImpl(connection);
 
             // Fetch the current user
-            User userEntity = userDAOImpl.findUserById(user.getId()).get();
+            User userEntity = userDAO.findUserById(user.getId()).get();
 
             userEntity.setPassword(user.getPassword());
             userEntity.setFullName(user.getName());
             userEntity.setProfilePic(user.getPicture());
 
-            userDAOImpl.saveUser(userEntity);
+            userDAO.saveUser(userEntity);
 
             Path path = Paths.get(appLocation, "uploads");
             Path picturePath = path.resolve(user.getId());

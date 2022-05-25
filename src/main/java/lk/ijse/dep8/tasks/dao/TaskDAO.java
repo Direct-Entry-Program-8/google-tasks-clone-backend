@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface TaskDAO {
 
-    public boolean existsTaskById(int taskId);
+    public abstract boolean existsTaskById(int taskId);
 
     public Task saveTask(Task task);
 
