@@ -1,6 +1,7 @@
 package lk.ijse.dep8.tasks.dao;
 
 import lk.ijse.dep8.tasks.dao.exception.DataAccessException;
+import lk.ijse.dep8.tasks.dao.impl.UserDAOImpl;
 import lk.ijse.dep8.tasks.entity.User;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,10 +18,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserDAOTest {
+class UserDAOImplTest {
 
     private static Connection connection;
-    private static UserDAO userDAO;
+    private static UserDAOImpl userDAOImpl;
 
     @BeforeAll
     static void setUp() {
@@ -28,7 +29,7 @@ class UserDAOTest {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dep8_tasks", "root", "mysql");
             connection.setAutoCommit(false);
-            userDAO = new UserDAO(connection);
+            userDAOImpl = new UserDAOImpl(connection);
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
@@ -60,7 +61,7 @@ class UserDAOTest {
     @ParameterizedTest
     void saveUser(User givenUser) {
         // when
-        User savedUser = userDAO.saveUser(givenUser);
+        User savedUser = userDAOImpl.saveUser(givenUser);
 
         // then
         assertEquals(givenUser, savedUser);
@@ -72,7 +73,7 @@ class UserDAOTest {
     @ParameterizedTest
     void existsUserById(String givenUserId) {
         // when
-        boolean result = userDAO.existsUserById(givenUserId);
+        boolean result = userDAOImpl.existsUserById(givenUserId);
 
         // then
         if (givenUserId.equals("U100")) {
@@ -87,7 +88,7 @@ class UserDAOTest {
     @ParameterizedTest
     void findUserById(String givenUserId) {
         // when
-        Optional<User> userWrapper = userDAO.findUserById(givenUserId);
+        Optional<User> userWrapper = userDAOImpl.findUserById(givenUserId);
 
         // then
         if (givenUserId.equals("U100")) {
@@ -101,7 +102,7 @@ class UserDAOTest {
     @Test
     void findAllUsers() {
         // when
-        List<User> allUsers = userDAO.findAllUsers();
+        List<User> allUsers = userDAOImpl.findAllUsers();
 
         // then
         assertTrue(allUsers.size() >= 5);
@@ -113,12 +114,12 @@ class UserDAOTest {
     void deleteUserById(String givenUserId) {
         // when
         if (givenUserId.equals("U100")) {
-            assertThrows(DataAccessException.class, () -> userDAO.deleteUserById(givenUserId));
+            assertThrows(DataAccessException.class, () -> userDAOImpl.deleteUserById(givenUserId));
         } else {
-            userDAO.deleteUserById(givenUserId);
+            userDAOImpl.deleteUserById(givenUserId);
         }
 
-        assertFalse(userDAO.existsUserById(givenUserId));
+        assertFalse(userDAOImpl.existsUserById(givenUserId));
     }
 
     @Order(6)
@@ -127,7 +128,7 @@ class UserDAOTest {
         // given
         long count = 5;
         // when
-        long result = userDAO.countUsers();
+        long result = userDAOImpl.countUsers();
         // then
         assertTrue(result >= 5);
     }
