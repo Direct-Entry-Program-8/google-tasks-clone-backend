@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -38,8 +39,10 @@ public class UserService {
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
             UserDAO userDAO = new UserDAO(connection);
+            // DTO -> Entity
             User userEntity = new User(user.getId(), user.getEmail(), user.getPassword(), user.getName(), user.getPicture());
             User savedUser = userDAO.saveUser(userEntity);
+            // Entity -> DTO
             user = new UserDTO(savedUser.getId(), savedUser.getFullName(), savedUser.getEmail(),
                     savedUser.getPassword(), savedUser.getProfilePic());
 
@@ -64,11 +67,15 @@ public class UserService {
     }
 
     public  UserDTO getUser(Connection connection, String userIdOrEmail) throws SQLException {
-        return new OldUserDAO().getUser(connection, userIdOrEmail);
+        UserDAO userDAO = new UserDAO(connection);
+        Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
+        return userWrapper.map(e -> new UserDTO(e.getId(), e.getFullName(), e.getEmail(),
+                e.getPassword(), e.getProfilePic())).orElse(null);
     }
 
     public  void deleteUser(Connection connection, String userId, String appLocation) throws SQLException {
-        new OldUserDAO().deleteUser(connection, userId);
+        UserDAO userDAO = new UserDAO(connection);
+        userDAO.deleteUserById(userId);
 
         new Thread(() -> {
             Path imagePath = Paths.get(appLocation, "uploads",
@@ -87,7 +94,17 @@ public class UserService {
             connection.setAutoCommit(false);
 
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
-            new OldUserDAO().updateUser(connection, user);
+
+            UserDAO userDAO = new UserDAO(connection);
+
+            // Fetch the current user
+            User userEntity = userDAO.findUserById(user.getId()).get();
+
+            userEntity.setPassword(user.getPassword());
+            userEntity.setFullName(user.getName());
+            userEntity.setProfilePic(user.getPicture());
+
+            userDAO.saveUser(userEntity);
 
             Path path = Paths.get(appLocation, "uploads");
             Path picturePath = path.resolve(user.getId());
