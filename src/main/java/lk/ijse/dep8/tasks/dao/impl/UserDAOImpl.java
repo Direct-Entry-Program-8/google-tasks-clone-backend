@@ -18,10 +18,10 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean existsById(Object userId) {
+    public boolean existsById(String userId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT id FROM user WHERE id=?");
-            stm.setString(1, (String) userId);
+            stm.setString(1, userId);
             return stm.executeQuery().next();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -40,8 +40,7 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public Object save(Object entity) {
-        User user = (User) entity;
+    public User save(User user) {
         try {
             if (!existsById(user.getId())) {
                 PreparedStatement stm = connection.
@@ -73,13 +72,13 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public void deleteById(Object userId) {
+    public void deleteById(String userId) {
         try {
             if (!existsById(userId)){
                 throw new DataAccessException("No user found");
             }
             PreparedStatement stm = connection.prepareStatement("DELETE FROM user WHERE id=?");
-            stm.setString(1, (String) userId);
+            stm.setString(1,  userId);
             if (stm.executeUpdate() != 1) {
                 throw new SQLException("Failed to delete the user");
             }
@@ -89,10 +88,10 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public Optional<Object> findById(Object userId) {
+    public Optional<User> findById(String userId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM user WHERE id=?");
-            stm.setString(1, (String) userId);
+            stm.setString(1,  userId);
             ResultSet rst = stm.executeQuery();
             if (rst.next()){
                 return Optional.of(new User(rst.getString("id"),
@@ -130,11 +129,11 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public List<Object> findAll() {
+    public List<User> findAll() {
         try {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM user");
-            List<Object> users = new ArrayList<>();
+            List<User> users = new ArrayList<>();
             while (rst.next()) {
                 users.add(new User(rst.getString("id"),
                         rst.getString("email"),

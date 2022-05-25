@@ -19,7 +19,7 @@ public class TaskListDAOImpl implements TaskListDAO {
     }
 
     @Override
-    public boolean existsById(Object listId) {
+    public boolean existsById(Integer listId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT id FROM task_list WHERE id=?");
             stm.setInt(1, (int) listId);
@@ -30,8 +30,7 @@ public class TaskListDAOImpl implements TaskListDAO {
     }
 
     @Override
-    public Object save(Object entity) {
-        TaskList taskList = (TaskList) entity;
+    public TaskList save(TaskList taskList) {
         try {
             if (!existsById(taskList.getId())) {
                 PreparedStatement stm = connection.
@@ -58,9 +57,9 @@ public class TaskListDAOImpl implements TaskListDAO {
     }
 
     @Override
-    public void deleteById(Object listId) {
+    public void deleteById(Integer listId) {
         try {
-            if (!existsTaskListById(listId)){
+            if (!existsById(listId)){
                 throw new DataAccessException("No task list found");
             }
             PreparedStatement stm = connection.prepareStatement("DELETE FROM task_list WHERE id=?");
@@ -74,7 +73,7 @@ public class TaskListDAOImpl implements TaskListDAO {
     }
 
     @Override
-    public Optional<Object> findById(Object listId) {
+    public Optional<TaskList> findById(Integer listId) {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM task_list WHERE id=?");
             stm.setInt(1, listId);
@@ -92,7 +91,7 @@ public class TaskListDAOImpl implements TaskListDAO {
     }
 
     @Override
-    public List<Object> findAll() {
+    public List<TaskList> findAll() {
         try {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM task_list");

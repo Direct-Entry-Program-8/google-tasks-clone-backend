@@ -1,5 +1,7 @@
 package lk.ijse.dep8.tasks.dao;
 
-public interface TaskListDAO extends SuperDAO {
+import lk.ijse.dep8.tasks.entity.TaskList;
+
+public interface TaskListDAO extends SuperDAO<TaskList, Integer> {
 
 }
