@@ -6,6 +6,7 @@ import lk.ijse.dep8.tasks.dto.UserDTO;
 import lk.ijse.dep8.tasks.entity.User;
 import lk.ijse.dep8.tasks.service.custom.UserService;
 import lk.ijse.dep8.tasks.service.exception.FailedExecutionException;
+import lk.ijse.dep8.tasks.service.util.ExecutionContext;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.servlet.http.Part;
@@ -68,18 +69,10 @@ public class UserServiceImpl implements UserService {
             connection.commit();
             return user;
         } catch (Throwable t) {
-            try {
-                connection.rollback();
-                throw new FailedExecutionException("Failed to save the user", t);
-            } catch (SQLException e) {
-                throw new FailedExecutionException("Failed to save the user", e);
-            }
+            ExecutionContext.execute(connection::rollback);
+            throw new FailedExecutionException("Failed to save the user", t);
         } finally {
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                logger.log(Level.SEVERE, e.getMessage(), e);
-            }
+            ExecutionContext.execute(() -> connection.setAutoCommit(true));
         }
     }
 
@@ -139,10 +132,10 @@ public class UserServiceImpl implements UserService {
 
             connection.commit();
         } catch (Throwable e) {
-            connection.rollback();
-            throw new RuntimeException(e);
+            ExecutionContext.execute(connection::rollback);
+            throw new FailedExecutionException("Failed to update the user", e);
         } finally {
-            connection.setAutoCommit(true);
+            ExecutionContext.execute(() -> connection.setAutoCommit(true));
         }
     }
 
