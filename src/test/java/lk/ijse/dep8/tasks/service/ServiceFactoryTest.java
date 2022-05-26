@@ -1,5 +1,7 @@
 package lk.ijse.dep8.tasks.service;
 
+import lk.ijse.dep8.tasks.service.custom.TaskService;
+import lk.ijse.dep8.tasks.service.custom.UserService;
 import lk.ijse.dep8.tasks.service.custom.impl.TaskServiceImpl;
 import lk.ijse.dep8.tasks.service.custom.impl.UserServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -42,10 +44,10 @@ class ServiceFactoryTest {
     @Test
     void getService() {
 //        Connection mockConnection = mock(Connection.class);
-        SuperService userService = ServiceFactory.getInstance().
-                getService(mockConnection, ServiceFactory.ServiceTypes.USER);
-        SuperService taskService = ServiceFactory.getInstance().
-                getService(mockConnection, ServiceFactory.ServiceTypes.TASK);
+        UserService userService = ServiceFactory.getInstance().
+                getService( ServiceFactory.ServiceTypes.USER);
+        TaskService taskService = ServiceFactory.getInstance().
+                getService( ServiceFactory.ServiceTypes.TASK);
 
         assertNotNull(userService);
         assertNotNull(taskService);

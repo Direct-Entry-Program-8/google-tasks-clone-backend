@@ -13,6 +13,7 @@ public class EntityDTOMapper {
     public static UserDTO getUserDTO(User user) {
         ModelMapper mapper = new ModelMapper();
         return mapper.typeMap(User.class, UserDTO.class)
+                .addMapping(User::getFullName, UserDTO::setName)
                 .addMapping(User::getProfilePic, UserDTO::setPicture)
                 .map(user);
     }
@@ -34,6 +35,7 @@ public class EntityDTOMapper {
     public static User getUser(UserDTO userDTO) {
         ModelMapper mapper = new ModelMapper();
         return mapper.typeMap(UserDTO.class, User.class)
+                .addMapping(UserDTO::getName, User::setFullName)
                 .addMapping(UserDTO::getPicture, User::setProfilePic)
                 .map(userDTO);
     }
