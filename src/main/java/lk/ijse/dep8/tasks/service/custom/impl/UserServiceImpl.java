@@ -83,6 +83,7 @@ public class UserServiceImpl implements UserService {
             if (connection != null){
                 Connection tempConnection = connection;
                 ExecutionContext.execute(() -> tempConnection.setAutoCommit(true));
+                ExecutionContext.execute(connection::close);
             }
         }
     }
@@ -160,6 +161,7 @@ public class UserServiceImpl implements UserService {
             if (connection != null){
                 Connection tempConnection = connection;
                 ExecutionContext.execute(() -> tempConnection.setAutoCommit(true));
+                ExecutionContext.execute(connection::close);
             }
         }
     }
