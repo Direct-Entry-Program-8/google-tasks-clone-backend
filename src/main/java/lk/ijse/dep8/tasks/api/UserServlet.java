@@ -38,9 +38,9 @@ public class UserServlet extends HttpServlet2 {
             if (!new UserServiceImpl(connection).existsUser(userId)) {
                 throw new ResponseStatusException(404, "Invalid user id");
             } else {
-                return new UserServiceImpl(connection).getUser( userId);
+                return new UserServiceImpl(connection).getUser(userId);
             }
-        }catch (ResponseStatusException e){
+        } catch (ResponseStatusException e) {
             throw e;
         } catch (Throwable e) {
             throw new ResponseStatusException(500, "Failed to fetch the user info", e);
@@ -75,11 +75,11 @@ public class UserServlet extends HttpServlet2 {
                         + request.getServerPort() + request.getContextPath();
                 pictureUrl += "/uploads/" + user.getId();
             }
-            new UserServiceImpl(connection).updateUser( new UserDTO(user.getId(), name, user.getEmail(), password, pictureUrl),
+            new UserServiceImpl(connection).updateUser(new UserDTO(user.getId(), name, user.getEmail(), password, pictureUrl),
                     picture, getServletContext().getRealPath("/"));
 
             resp.setStatus(204);
-        }catch (ResponseStatusException e){
+        } catch (ResponseStatusException e) {
             throw e;
         } catch (Throwable e) {
             throw new ResponseStatusException(500, e.getMessage(), e);
@@ -90,11 +90,11 @@ public class UserServlet extends HttpServlet2 {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         UserDTO user = getUser(req);
         try (Connection connection = pool.getConnection()) {
-            new UserServiceImpl(connection).deleteUser( user.getId(),
+            new UserServiceImpl(connection).deleteUser(user.getId(),
                     getServletContext().getRealPath("/"));
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-        }catch (ResponseStatusException e){
-                throw e;
+        } catch (ResponseStatusException e) {
+            throw e;
         } catch (Throwable e) {
             throw new ResponseStatusException(500, e.getMessage(), e);
         }
@@ -135,7 +135,7 @@ public class UserServlet extends HttpServlet2 {
         }
 
         try (Connection connection = pool.getConnection()) {
-            if (new UserServiceImpl(connection).existsUser( email)) {
+            if (new UserServiceImpl(connection).existsUser(email)) {
                 throw new ResponseStatusException(HttpServletResponse.SC_CONFLICT, "A user has been already registered with this email");
             }
 
@@ -146,14 +146,14 @@ public class UserServlet extends HttpServlet2 {
             }
             UserDTO user = new UserDTO(null, name, email, password, pictureUrl);
 
-            user = new UserServiceImpl(connection).registerUser( picture,
+            user = new UserServiceImpl(connection).registerUser(picture,
                     getServletContext().getRealPath("/"), user);
 
             response.setStatus(HttpServletResponse.SC_CREATED);
             response.setContentType("application/json");
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(user, response.getWriter());
-        }catch (ResponseStatusException e){
+        } catch (ResponseStatusException e) {
             throw e;
         } catch (Throwable e) {
             throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to register the user", e);
