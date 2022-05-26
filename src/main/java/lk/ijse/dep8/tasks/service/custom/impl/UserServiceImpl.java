@@ -1,4 +1,4 @@
-package lk.ijse.dep8.tasks.service;
+package lk.ijse.dep8.tasks.service.custom.impl;
 
 import lk.ijse.dep8.tasks.dao.DAOFactory;
 import lk.ijse.dep8.tasks.dao.custom.UserDAO;
@@ -17,9 +17,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class UserService {
+public class UserServiceImpl {
 
-    private final Logger logger = Logger.getLogger(UserService.class.getName());
+    private final Logger logger = Logger.getLogger(UserServiceImpl.class.getName());
 
     public boolean existsUser(Connection connection, String userIdOrEmail) throws SQLException {
         UserDAO userDAO = DAOFactory.getInstance().getDAO(connection, DAOFactory.DAOTypes.USER);
