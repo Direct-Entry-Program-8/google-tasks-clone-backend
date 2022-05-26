@@ -6,6 +6,7 @@ import lk.ijse.dep8.tasks.dto.UserDTO;
 import lk.ijse.dep8.tasks.entity.User;
 import lk.ijse.dep8.tasks.service.custom.UserService;
 import lk.ijse.dep8.tasks.service.exception.FailedExecutionException;
+import lk.ijse.dep8.tasks.service.util.EntityDTOMapper;
 import lk.ijse.dep8.tasks.service.util.ExecutionContext;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -50,11 +51,10 @@ public class UserServiceImpl implements UserService {
 
             UserDAO userDAO =  DAOFactory.getInstance().getDAO(connection, DAOFactory.DAOTypes.USER);
             // DTO -> Entity
-            User userEntity = new User(user.getId(), user.getEmail(), user.getPassword(), user.getName(), user.getPicture());
+            User userEntity = EntityDTOMapper.getUser(user);
             User savedUser = userDAO.save(userEntity);
             // Entity -> DTO
-            user = new UserDTO(savedUser.getId(), savedUser.getFullName(), savedUser.getEmail(),
-                    savedUser.getPassword(), savedUser.getProfilePic());
+            user = EntityDTOMapper.getUserDTO(savedUser);
 
             if (picture != null) {
                 Path path = Paths.get(appLocation, "uploads");
@@ -79,8 +79,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUser(String userIdOrEmail)  {
         UserDAO userDAO =  DAOFactory.getInstance().getDAO(connection, DAOFactory.DAOTypes.USER);
         Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
-        return userWrapper.map(e -> new UserDTO(e.getId(), e.getFullName(), e.getEmail(),
-                e.getPassword(), e.getProfilePic())).orElse(null);
+        return EntityDTOMapper.getUserDTO(userWrapper.orElse(null));
     }
 
     public void deleteUser(String userId, String appLocation)  {
