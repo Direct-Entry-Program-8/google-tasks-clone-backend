@@ -25,7 +25,7 @@ public class DAOFactory {
             case TASK_LIST:
                 return null;//(T) new TaskListDAOImpl(connection);
             case TASK:
-                return (T) new TaskDAOImpl(connection);
+                return null; //(T) new TaskDAOImpl(connection);
             case QUERY:
                 return (T) new QueryDAOImpl(connection);
             default:
