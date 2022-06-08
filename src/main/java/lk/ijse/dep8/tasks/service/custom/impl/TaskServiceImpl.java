@@ -7,10 +7,10 @@ import javax.sql.DataSource;
 
 public class TaskServiceImpl implements TaskService {
 
-    private final DataSource dataSource;
+    private final DataSource pool;
 
     public TaskServiceImpl() {
-        dataSource = JNDIConnectionPool.getInstance().getDataSource();
+        pool = JNDIConnectionPool.getInstance().getDataSource();
     }
 
 }
