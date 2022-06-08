@@ -1,5 +1,6 @@
 package lk.ijse.dep8.tasks.service.util;
 
+import lk.ijse.dep8.tasks.entity.TaskList;
 import lk.ijse.dep8.tasks.entity.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -22,6 +23,7 @@ public class HibernateUtil {
 
         Metadata metadata = new MetadataSources(standardRegistry)
                 .addAnnotatedClass(User.class)
+                .addAnnotatedClass(TaskList.class)
                 .getMetadataBuilder()
                 .applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE)
                 .build();

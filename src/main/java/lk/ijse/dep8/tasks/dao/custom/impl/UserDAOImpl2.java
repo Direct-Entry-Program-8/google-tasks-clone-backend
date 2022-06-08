@@ -4,6 +4,7 @@ import lk.ijse.dep8.tasks.dao.custom.UserDAO;
 import lk.ijse.dep8.tasks.entity.User;
 import org.hibernate.Session;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
