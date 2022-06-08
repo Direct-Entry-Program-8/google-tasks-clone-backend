@@ -3,16 +3,13 @@ package lk.ijse.dep8.tasks.dao.custom.impl;
 import lk.ijse.dep8.tasks.entity.User;
 import lk.ijse.dep8.tasks.service.util.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserDAOImpl2Test {
 
     private UserDAOImpl2 userDAO;
@@ -21,8 +18,8 @@ class UserDAOImpl2Test {
     @BeforeEach
     void setUp() {
         session = HibernateUtil.getSessionFactory().openSession();
-        session.beginTransaction();
         userDAO = new UserDAOImpl2(session);
+        session.beginTransaction();
     }
 
     @AfterEach
@@ -31,26 +28,41 @@ class UserDAOImpl2Test {
         session.close();
     }
 
-    @Test
-    void existsById() {
+    @AfterAll
+    static void afterAll() {
+        HibernateUtil.getSessionFactory().close();
     }
 
+    @Order(2)
+    @Test
+    void existsById() {
+        // given
+        String userId = "U001";
+
+        // when
+        boolean u001Exists = userDAO.existsById(userId);
+        boolean u002Exists = userDAO.existsById("U002");
+
+        // then
+        assertTrue(u001Exists);
+        assertFalse(u002Exists);
+    }
+
+    @Order(1)
     @Test
     void save() {
         // given
-        String userId = UUID.randomUUID().toString();
-        User user = new User(userId,
-                "dualnga@ijse.lk",
-                "admin",
-                "Dulanga",
+        User givenUser = new User("U001",
+                "lahiru@ijse.lk",
+                "lahiru",
+                "Lahiru",
                 null);
 
         // when
-        Serializable id = session.save(user);
+        User actualUser = userDAO.save(givenUser);
 
         // then
-        assertTrue(session.contains(user));
-        assertEquals(userId, id);
+        assertEquals(givenUser, actualUser);
     }
 
     @Test
