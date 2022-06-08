@@ -7,11 +7,11 @@ import org.hibernate.Session;
 import java.util.List;
 import java.util.Optional;
 
-public class TaskListDAOImpl2 implements TaskListDAO {
+public class TaskListDAOImpl implements TaskListDAO {
 
     private Session session;
 
-    public TaskListDAOImpl2(Session session) {
+    public TaskListDAOImpl(Session session) {
         this.session = session;
     }
 

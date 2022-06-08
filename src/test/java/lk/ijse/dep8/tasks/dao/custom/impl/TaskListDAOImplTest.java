@@ -11,15 +11,15 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaskListDAOImpl2Test {
+class TaskListDAOImplTest {
 
     private Session session;
-    private TaskListDAOImpl2 taskListDao;
+    private TaskListDAOImpl taskListDao;
 
     @BeforeEach
     void setUp() {
         session = HibernateUtil.getSessionFactory().openSession();
-        taskListDao = new TaskListDAOImpl2(session);
+        taskListDao = new TaskListDAOImpl(session);
         session.beginTransaction();
         session.save(new User("U001","dulanga@ijse.lk", "abc", "Dulanga", null));
     }

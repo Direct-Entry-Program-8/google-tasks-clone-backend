@@ -14,9 +14,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class UserDAOImpl2Test {
+class UserDAOImplTest {
 
-    private UserDAOImpl2 userDAO;
+    private UserDAOImpl userDAO;
     private Session session;
 
     static List<User> getDummyUsers() {
@@ -37,7 +37,7 @@ class UserDAOImpl2Test {
     @BeforeEach
     void setUp() {
         session = HibernateUtil.getSessionFactory().openSession();
-        userDAO = new UserDAOImpl2(session);
+        userDAO = new UserDAOImpl(session);
         session.beginTransaction();
     }
 
