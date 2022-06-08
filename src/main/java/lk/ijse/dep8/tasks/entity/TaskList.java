@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Data
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "task_list")
@@ -19,4 +20,9 @@ public class TaskList implements SuperEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     @ManyToOne
     private User user;
+
+    public TaskList(String name, User user) {
+        this.name = name;
+        this.user = user;
+    }
 }
