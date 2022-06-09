@@ -56,7 +56,7 @@ class UserDAOImplTest {
         User actualUser = userDAO.save(givenUser);
 
         // then
-        assertDoesNotThrow(() -> existsById(givenUser));
+        //assertDoesNotThrow(() -> existsById(givenUser));
         assertEquals(givenUser, actualUser);
     }
 

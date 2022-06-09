@@ -7,8 +7,6 @@ import org.hibernate.Session;
 
 public class TaskDAOImpl extends CrudDAOImpl<Task, Integer> implements TaskDAO {
 
-    private final Session session;
-
     public TaskDAOImpl(Session session) {
         this.session = session;
     }

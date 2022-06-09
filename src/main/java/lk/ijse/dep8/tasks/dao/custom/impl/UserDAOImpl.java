@@ -10,8 +10,6 @@ import java.util.Optional;
 
 public class UserDAOImpl extends CrudDAOImpl<User, String> implements UserDAO {
 
-    private final Session session;
-
     public UserDAOImpl(Session session) {
         this.session = session;
     }
