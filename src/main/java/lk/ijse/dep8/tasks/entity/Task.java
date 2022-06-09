@@ -10,6 +10,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Data
 @Entity
+@Table(name = "task")
 public class Task implements SuperEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
