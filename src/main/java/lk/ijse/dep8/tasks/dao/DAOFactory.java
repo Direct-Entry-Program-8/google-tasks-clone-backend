@@ -2,7 +2,9 @@ package lk.ijse.dep8.tasks.dao;
 
 import lk.ijse.dep8.tasks.dao.custom.impl.QueryDAOImpl;
 import lk.ijse.dep8.tasks.dao.custom.impl.TaskDAOImpl;
+import lk.ijse.dep8.tasks.dao.custom.impl.TaskListDAOImpl;
 import lk.ijse.dep8.tasks.dao.custom.impl.UserDAOImpl;
+import org.hibernate.Session;
 
 import java.sql.Connection;
 
@@ -18,16 +20,16 @@ public class DAOFactory {
         return (daoFactory == null)? (daoFactory = new DAOFactory()): daoFactory;
     }
 
-    public <T extends SuperDAO> T getDAO(Connection connection, DAOTypes daoType){
+    public <T extends SuperDAO> T getDAO(Session session, DAOTypes daoType){
         switch (daoType){
             case USER:
-                return null;//(T) new UserDAOImpl(connection);
+                return (T) new UserDAOImpl(session);
             case TASK_LIST:
-                return null;//(T) new TaskListDAOImpl(connection);
+                return (T) new TaskListDAOImpl(session);
             case TASK:
-                return null; //(T) new TaskDAOImpl(connection);
+                return (T) new TaskDAOImpl(session);
             case QUERY:
-                return null;//(T) new QueryDAOImpl(connection);
+                return (T) new QueryDAOImpl(session);
             default:
                 return null;
         }
