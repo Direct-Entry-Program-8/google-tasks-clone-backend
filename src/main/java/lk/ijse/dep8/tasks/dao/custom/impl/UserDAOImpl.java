@@ -5,6 +5,7 @@ import lk.ijse.dep8.tasks.dao.custom.UserDAO;
 import lk.ijse.dep8.tasks.entity.User;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.util.Optional;
 
 public class UserDAOImpl extends CrudDAOImpl<User, String> implements UserDAO {
@@ -20,9 +21,13 @@ public class UserDAOImpl extends CrudDAOImpl<User, String> implements UserDAO {
 
     @Override
     public Optional<User> findUserByIdOrEmail(String userIdOrEmail) {
-        return Optional.ofNullable(em.createQuery("SELECT u FROM User u WHERE u.id = :id OR u.email = :email", User.class)
-                .setParameter("id", userIdOrEmail)
-                .setParameter("email", userIdOrEmail)
-                .getSingleResult());
+        try {
+            return Optional.of((em.createQuery("SELECT u FROM User u WHERE u.id = :id OR u.email = :email", User.class)
+                    .setParameter("id", userIdOrEmail)
+                    .setParameter("email", userIdOrEmail)
+                    .getSingleResult()));
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 }
