@@ -6,6 +6,7 @@ import lk.ijse.dep8.tasks.dao.custom.impl.TaskListDAOImpl;
 import lk.ijse.dep8.tasks.dao.custom.impl.UserDAOImpl;
 import org.hibernate.Session;
 
+import javax.persistence.EntityManager;
 import java.sql.Connection;
 
 public class DAOFactory {
@@ -20,16 +21,16 @@ public class DAOFactory {
         return (daoFactory == null)? (daoFactory = new DAOFactory()): daoFactory;
     }
 
-    public <T extends SuperDAO> T getDAO(Session session, DAOTypes daoType){
+    public <T extends SuperDAO> T getDAO(EntityManager em, DAOTypes daoType){
         switch (daoType){
             case USER:
-                return (T) new UserDAOImpl(session);
+                return (T) new UserDAOImpl(em);
             case TASK_LIST:
-                return (T) new TaskListDAOImpl(session);
+                return (T) new TaskListDAOImpl(em);
             case TASK:
-                return (T) new TaskDAOImpl(session);
+                return (T) new TaskDAOImpl(em);
             case QUERY:
-                return (T) new QueryDAOImpl(session);
+                return (T) new QueryDAOImpl(em);
             default:
                 return null;
         }

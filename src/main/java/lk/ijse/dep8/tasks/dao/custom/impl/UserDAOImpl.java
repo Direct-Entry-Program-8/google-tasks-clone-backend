@@ -3,15 +3,14 @@ package lk.ijse.dep8.tasks.dao.custom.impl;
 import lk.ijse.dep8.tasks.dao.CrudDAOImpl;
 import lk.ijse.dep8.tasks.dao.custom.UserDAO;
 import lk.ijse.dep8.tasks.entity.User;
-import org.hibernate.Session;
 
-import java.util.List;
+import javax.persistence.EntityManager;
 import java.util.Optional;
 
 public class UserDAOImpl extends CrudDAOImpl<User, String> implements UserDAO {
 
-    public UserDAOImpl(Session session) {
-        this.session = session;
+    public UserDAOImpl(EntityManager em) {
+        this.em = em;
     }
 
     @Override
@@ -21,9 +20,9 @@ public class UserDAOImpl extends CrudDAOImpl<User, String> implements UserDAO {
 
     @Override
     public Optional<User> findUserByIdOrEmail(String userIdOrEmail) {
-        return session.createQuery("FROM User u WHERE u.id = :id OR u.email = :email", User.class)
+        return Optional.ofNullable(em.createQuery("SELECT u FROM User u WHERE u.id = :id OR u.email = :email", User.class)
                 .setParameter("id", userIdOrEmail)
                 .setParameter("email", userIdOrEmail)
-                .uniqueResultOptional();
+                .getSingleResult());
     }
 }
