@@ -7,10 +7,10 @@ import lk.ijse.dep8.tasks.entity.User;
 import lk.ijse.dep8.tasks.service.custom.UserService;
 import lk.ijse.dep8.tasks.service.exception.FailedExecutionException;
 import lk.ijse.dep8.tasks.service.util.EntityDTOMapper;
-import lk.ijse.dep8.tasks.service.util.HibernateUtil;
+import lk.ijse.dep8.tasks.service.util.JPAUtil;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.hibernate.Session;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,18 +25,21 @@ public class UserServiceImpl implements UserService {
     private final Logger logger = Logger.getLogger(UserServiceImpl.class.getName());
 
     public boolean existsUser(String userIdOrEmail) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
+        EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
             return userDAO.existsUserByEmailOrId(userIdOrEmail);
+        } finally {
+            em.close();
         }
     }
 
     public UserDTO registerUser(Part picture,
                                 String appLocation,
                                 UserDTO user) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
         try {
-            session.beginTransaction();
+            em.getTransaction().begin();
             user.setId(UUID.randomUUID().toString());
 
             if (picture != null) {
@@ -44,7 +47,7 @@ public class UserServiceImpl implements UserService {
             }
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
+            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
             // DTO -> Entity
             User userEntity = EntityDTOMapper.getUser(user);
             User savedUser = userDAO.save(userEntity);
@@ -61,33 +64,36 @@ public class UserServiceImpl implements UserService {
                 picture.write(picturePath);
             }
 
-            session.getTransaction().commit();
+            em.getTransaction().commit();
             return user;
         } catch (Throwable t) {
-            if (session != null && session.getTransaction() != null) {
-                session.getTransaction().rollback();
+            if (em != null && em.getTransaction() != null) {
+                em.getTransaction().rollback();
             }
             throw new FailedExecutionException("Failed to save the user", t);
         } finally {
-            session.close();
+            em.close();
         }
     }
 
     public UserDTO getUser(String userIdOrEmail) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
+        EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
             Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
             return EntityDTOMapper.getUserDTO(userWrapper.orElse(null));
+        } finally {
+            em.close();
         }
     }
 
     public void deleteUser(String userId, String appLocation) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
         try {
-            session.beginTransaction();
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
+            em.getTransaction().begin();
+            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
             userDAO.deleteById(userId);
-            session.getTransaction().commit();
+            em.getTransaction().commit();
 
             new Thread(() -> {
                 Path imagePath = Paths.get(appLocation, "uploads",
@@ -99,23 +105,23 @@ public class UserServiceImpl implements UserService {
                 }
             }).start();
         } catch (Throwable t) {
-            if (session != null && session.getTransaction() != null) session.getTransaction().rollback();
+            if (em != null && em.getTransaction() != null) em.getTransaction().rollback();
             throw new FailedExecutionException("Failed to delete the user", t);
         } finally {
-            session.close();
+            em.close();
         }
 
     }
 
     public void updateUser(UserDTO user, Part picture,
                            String appLocation) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
         try {
-            session.beginTransaction();
+            em.getTransaction().begin();
 
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
+            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
 
             // Fetch the current user
             User userEntity = userDAO.findById(user.getId()).get();
@@ -140,12 +146,12 @@ public class UserServiceImpl implements UserService {
                 Files.deleteIfExists(picturePath);
             }
 
-            session.getTransaction().commit();
+            em.getTransaction().commit();
         } catch (Throwable e) {
-            if (session != null && session.getTransaction() != null) session.getTransaction().rollback();
+            if (em != null && em.getTransaction() != null) em.getTransaction().rollback();
             throw new FailedExecutionException("Failed to update the user", e);
         } finally {
-            session.close();
+            em.close();
         }
     }
 
