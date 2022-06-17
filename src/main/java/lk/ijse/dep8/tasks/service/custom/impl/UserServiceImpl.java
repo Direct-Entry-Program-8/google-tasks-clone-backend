@@ -1,6 +1,5 @@
 package lk.ijse.dep8.tasks.service.custom.impl;
 
-import lk.ijse.dep8.tasks.dao.DAOFactory;
 import lk.ijse.dep8.tasks.dao.custom.UserDAO;
 import lk.ijse.dep8.tasks.dto.UserDTO;
 import lk.ijse.dep8.tasks.entity.User;
@@ -9,6 +8,9 @@ import lk.ijse.dep8.tasks.service.exception.FailedExecutionException;
 import lk.ijse.dep8.tasks.service.util.EntityDTOMapper;
 import lk.ijse.dep8.tasks.service.util.JPAUtil;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.Part;
@@ -20,14 +22,18 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+@Scope("prototype")
+@Component
 public class UserServiceImpl implements UserService {
 
     private final Logger logger = Logger.getLogger(UserServiceImpl.class.getName());
+    @Autowired
+    private UserDAO userDAO;
 
     public boolean existsUser(String userIdOrEmail) {
         EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
         try {
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
+            userDAO.setEntityManager(em);
             return userDAO.existsUserByEmailOrId(userIdOrEmail);
         } finally {
             em.close();
@@ -47,7 +53,7 @@ public class UserServiceImpl implements UserService {
             }
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
+            userDAO.setEntityManager(em);
             // DTO -> Entity
             User userEntity = EntityDTOMapper.getUser(user);
             User savedUser = userDAO.save(userEntity);
@@ -79,7 +85,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUser(String userIdOrEmail) {
         EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
         try {
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
+            userDAO.setEntityManager(em);
             Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
             return EntityDTOMapper.getUserDTO(userWrapper.orElse(null));
         } finally {
@@ -91,7 +97,7 @@ public class UserServiceImpl implements UserService {
         EntityManager em = JPAUtil.getEntityManagerFactory().createEntityManager();
         try {
             em.getTransaction().begin();
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
+            userDAO.setEntityManager(em);
             userDAO.deleteById(userId);
             em.getTransaction().commit();
 
@@ -121,7 +127,7 @@ public class UserServiceImpl implements UserService {
 
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(em, DAOFactory.DAOTypes.USER);
+            userDAO.setEntityManager(em);
 
             // Fetch the current user
             User userEntity = userDAO.findById(user.getId()).get();
