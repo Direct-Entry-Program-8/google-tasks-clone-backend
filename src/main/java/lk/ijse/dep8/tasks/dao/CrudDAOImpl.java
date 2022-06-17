@@ -19,6 +19,11 @@ public abstract class CrudDAOImpl<T extends SuperEntity, ID extends Serializable
     }
 
     @Override
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    @Override
     public boolean existsById(ID pk) {
         return findById(pk).isPresent();
     }

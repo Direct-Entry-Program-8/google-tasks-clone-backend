@@ -3,22 +3,17 @@ package lk.ijse.dep8.tasks.api;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import lk.ijse.dep8.tasks.dto.UserDTO;
-import lk.ijse.dep8.tasks.service.ServiceFactory;
-import lk.ijse.dep8.tasks.service.SuperService;
 import lk.ijse.dep8.tasks.service.custom.UserService;
-import lk.ijse.dep8.tasks.service.custom.impl.UserServiceImpl;
 import lk.ijse.dep8.tasks.util.HttpServlet2;
 import lk.ijse.dep8.tasks.util.ResponseStatusException;
+import org.springframework.context.ApplicationContext;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.logging.Logger;
 
 @WebServlet(name = "UserServlet")
@@ -34,9 +29,9 @@ public class UserServlet extends HttpServlet2 {
 
         String userId = req.getPathInfo().replaceAll("/", "");
 
-        try  {
-            UserService userService = ServiceFactory.getInstance().
-                    getService(ServiceFactory.ServiceTypes.USER);
+        try {
+            UserService userService = ((ApplicationContext) getServletContext().getAttribute("ioc"))
+                    .getBean(UserService.class);
             if (!userService.existsUser(userId)) {
                 throw new ResponseStatusException(404, "Invalid user id");
             } else {
@@ -78,7 +73,8 @@ public class UserServlet extends HttpServlet2 {
                 pictureUrl += "/uploads/" + user.getId();
             }
 
-            UserService userService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceTypes.USER);
+            UserService userService = ((ApplicationContext) getServletContext().getAttribute("ioc"))
+                    .getBean(UserService.class);
             userService.updateUser(new UserDTO(user.getId(), name, user.getEmail(), password, pictureUrl),
                     picture, getServletContext().getRealPath("/"));
 
@@ -93,8 +89,9 @@ public class UserServlet extends HttpServlet2 {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         UserDTO user = getUser(req);
-        try  {
-            UserService userService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceTypes.USER);
+        try {
+            UserService userService = ((ApplicationContext) getServletContext().getAttribute("ioc"))
+                    .getBean(UserService.class);
             userService.deleteUser(user.getId(),
                     getServletContext().getRealPath("/"));
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -138,7 +135,8 @@ public class UserServlet extends HttpServlet2 {
         }
 
         try {
-            UserService userService = ServiceFactory.getInstance().getService(ServiceFactory.ServiceTypes.USER);
+            UserService userService = ((ApplicationContext) getServletContext().getAttribute("ioc"))
+                    .getBean(UserService.class);
             if (userService.existsUser(email)) {
                 throw new ResponseStatusException(HttpServletResponse.SC_CONFLICT, "A user has been already registered with this email");
             }

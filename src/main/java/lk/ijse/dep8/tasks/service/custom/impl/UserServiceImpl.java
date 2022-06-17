@@ -33,6 +33,7 @@ public class UserServiceImpl implements UserService {
 
     public boolean existsUser(String userIdOrEmail) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            userDAO.setSession(session);
             return userDAO.existsUserByEmailOrId(userIdOrEmail);
         }
     }
@@ -50,6 +51,7 @@ public class UserServiceImpl implements UserService {
             }
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
+            userDAO.setSession(session);
             // DTO -> Entity
             User userEntity = EntityDTOMapper.getUser(user);
             User savedUser = userDAO.save(userEntity);
@@ -80,6 +82,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDTO getUser(String userIdOrEmail) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            userDAO.setSession(session);
             Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
             return EntityDTOMapper.getUserDTO(userWrapper.orElse(null));
         }
@@ -89,6 +92,7 @@ public class UserServiceImpl implements UserService {
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             session.beginTransaction();
+            userDAO.setSession(session);
             userDAO.deleteById(userId);
             session.getTransaction().commit();
 
@@ -118,6 +122,7 @@ public class UserServiceImpl implements UserService {
 
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
+            userDAO.setSession(session);
             // Fetch the current user
             User userEntity = userDAO.findById(user.getId()).get();
 
