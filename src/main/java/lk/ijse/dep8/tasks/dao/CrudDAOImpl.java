@@ -19,6 +19,11 @@ public abstract class CrudDAOImpl<T extends SuperEntity, ID extends Serializable
     }
 
     @Override
+    public void setEntityManager(EntityManager entityManager) {
+        this.em = entityManager;
+    }
+
+    @Override
     public boolean existsById(ID pk) {
         return findById(pk).isPresent();
     }
