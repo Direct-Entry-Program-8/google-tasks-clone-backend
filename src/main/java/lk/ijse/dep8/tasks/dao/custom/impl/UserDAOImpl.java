@@ -4,10 +4,14 @@ import lk.ijse.dep8.tasks.dao.CrudDAOImpl;
 import lk.ijse.dep8.tasks.dao.custom.UserDAO;
 import lk.ijse.dep8.tasks.entity.User;
 import org.hibernate.Session;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
+@Scope("prototype")
+@Component
 public class UserDAOImpl extends CrudDAOImpl<User, String> implements UserDAO {
 
     public UserDAOImpl(Session session) {

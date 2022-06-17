@@ -1,6 +1,5 @@
 package lk.ijse.dep8.tasks.service.custom.impl;
 
-import lk.ijse.dep8.tasks.dao.DAOFactory;
 import lk.ijse.dep8.tasks.dao.custom.UserDAO;
 import lk.ijse.dep8.tasks.dto.UserDTO;
 import lk.ijse.dep8.tasks.entity.User;
@@ -10,6 +9,9 @@ import lk.ijse.dep8.tasks.service.util.EntityDTOMapper;
 import lk.ijse.dep8.tasks.service.util.HibernateUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Part;
 import java.io.IOException;
@@ -20,13 +22,17 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+@Scope("prototype")
+@Component
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserDAO userDAO;
 
     private final Logger logger = Logger.getLogger(UserServiceImpl.class.getName());
 
     public boolean existsUser(String userIdOrEmail) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
             return userDAO.existsUserByEmailOrId(userIdOrEmail);
         }
     }
@@ -44,7 +50,6 @@ public class UserServiceImpl implements UserService {
             }
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
             // DTO -> Entity
             User userEntity = EntityDTOMapper.getUser(user);
             User savedUser = userDAO.save(userEntity);
@@ -75,7 +80,6 @@ public class UserServiceImpl implements UserService {
 
     public UserDTO getUser(String userIdOrEmail) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
             Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
             return EntityDTOMapper.getUserDTO(userWrapper.orElse(null));
         }
@@ -85,7 +89,6 @@ public class UserServiceImpl implements UserService {
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             session.beginTransaction();
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
             userDAO.deleteById(userId);
             session.getTransaction().commit();
 
@@ -114,8 +117,6 @@ public class UserServiceImpl implements UserService {
             session.beginTransaction();
 
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
-
-            UserDAO userDAO = DAOFactory.getInstance().getDAO(session, DAOFactory.DAOTypes.USER);
 
             // Fetch the current user
             User userEntity = userDAO.findById(user.getId()).get();
