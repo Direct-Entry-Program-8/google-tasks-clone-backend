@@ -7,9 +7,10 @@ import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 @Scope("prototype")
-@Component
+@Repository
 public class TaskListDAOImpl extends CrudDAOImpl<TaskList, Integer> implements TaskListDAO {
 
     public TaskListDAOImpl(@Nullable Session session) {

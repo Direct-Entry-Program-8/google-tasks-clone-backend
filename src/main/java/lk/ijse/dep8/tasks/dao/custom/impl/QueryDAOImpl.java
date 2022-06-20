@@ -6,11 +6,12 @@ import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 
 @Scope("prototype")
-@Component
+@Repository
 public class QueryDAOImpl implements QueryDAO {
 
     private Session session;
