@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -13,7 +14,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 import java.util.Properties;
 
 @Configuration
@@ -38,10 +38,11 @@ public class HibernateConfig {
     }
 
     @Bean
-    public DataSource dataSource(){
+    public JndiObjectFactoryBean dataSource(){
         JndiObjectFactoryBean jndiDataSource = new JndiObjectFactoryBean();
         jndiDataSource.setJndiName("java:comp/env/jdbc/pool");
-        return (DataSource) jndiDataSource.getObject();
+        jndiDataSource.setResourceRef(true);
+        return jndiDataSource;
     }
 
     private Properties hibernateProperties(){
