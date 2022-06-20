@@ -2,7 +2,6 @@ package lk.ijse.dep8.tasks.dao.custom.impl;
 
 import lk.ijse.dep8.tasks.entity.TaskList;
 import lk.ijse.dep8.tasks.entity.User;
-import lk.ijse.dep8.tasks.service.util.HibernateUtil;
 import org.hibernate.Session;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -18,8 +17,6 @@ class TaskListDAOImplTest {
 
     @BeforeEach
     void setUp() {
-        session = HibernateUtil.getSessionFactory().openSession();
-        taskListDao = new TaskListDAOImpl(session);
         session.beginTransaction();
         session.save(new User("U001","dulanga@ijse.lk", "abc", "Dulanga", null));
     }
@@ -40,12 +37,6 @@ class TaskListDAOImplTest {
         session.getTransaction().commit();
         session.close();
     }
-
-    @AfterAll
-    static void afterAll() {
-        HibernateUtil.getSessionFactory().close();
-    }
-
     @Test
     void existsById() {
     }

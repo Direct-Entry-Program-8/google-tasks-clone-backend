@@ -1,7 +1,6 @@
 package lk.ijse.dep8.tasks.dao.custom.impl;
 
 import lk.ijse.dep8.tasks.entity.User;
-import lk.ijse.dep8.tasks.service.util.HibernateUtil;
 import org.hibernate.Session;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,15 +28,8 @@ class UserDAOImplTest {
         return dummies;
     }
 
-    @AfterAll
-    static void afterAll() {
-        HibernateUtil.getSessionFactory().close();
-    }
-
     @BeforeEach
     void setUp() {
-        session = HibernateUtil.getSessionFactory().openSession();
-        userDAO = new UserDAOImpl(session);
         session.beginTransaction();
     }
 
