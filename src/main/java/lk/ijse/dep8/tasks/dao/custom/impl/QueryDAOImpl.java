@@ -3,24 +3,18 @@ package lk.ijse.dep8.tasks.dao.custom.impl;
 import lk.ijse.dep8.tasks.dao.custom.QueryDAO;
 import lk.ijse.dep8.tasks.entity.CustomEntity;
 import org.springframework.context.annotation.Scope;
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 
 @Scope("prototype")
-@Component
+@Repository
 public class QueryDAOImpl implements QueryDAO {
 
-    private EntityManager em;
+    private final EntityManager em;
 
-    public QueryDAOImpl(@Nullable EntityManager em) {
+    public QueryDAOImpl(EntityManager em) {
         this.em = em;
-    }
-
-    @Override
-    public void setEntityManager(EntityManager entityManager) {
-        this.em = entityManager;
     }
 
     @Override

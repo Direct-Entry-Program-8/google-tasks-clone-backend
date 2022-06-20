@@ -4,18 +4,17 @@ import lk.ijse.dep8.tasks.dao.CrudDAOImpl;
 import lk.ijse.dep8.tasks.dao.custom.UserDAO;
 import lk.ijse.dep8.tasks.entity.User;
 import org.springframework.context.annotation.Scope;
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.util.Optional;
 
 @Scope("prototype")
-@Component
+@Repository
 public class UserDAOImpl extends CrudDAOImpl<User, String> implements UserDAO {
 
-    public UserDAOImpl(@Nullable EntityManager em) {
+    public UserDAOImpl(EntityManager em) {
         this.em = em;
     }
 
