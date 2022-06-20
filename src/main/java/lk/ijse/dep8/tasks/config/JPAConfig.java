@@ -5,18 +5,25 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.jndi.JndiObjectFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 @PropertySource("classpath:application.properties")
 @PropertySource("classpath:application-prod.properties")
+@EnableTransactionManagement
 public class JPAConfig {
 
     private final Environment env;
@@ -31,6 +38,7 @@ public class JPAConfig {
         lcemfb.setDataSource(ds);
         lcemfb.setJpaVendorAdapter(jpaVendorAdapter);
         lcemfb.setPackagesToScan("lk.ijse.dep8.tasks.entity");
+        lcemfb.setJpaProperties(jpaProperties());
         return lcemfb;
     }
 
@@ -40,6 +48,7 @@ public class JPAConfig {
         jpaVendorAdapter.setDatabase(Database.MYSQL);
         jpaVendorAdapter.setDatabasePlatform(env.getRequiredProperty("hibernate.dialect"));
         jpaVendorAdapter.setShowSql(env.getProperty("hibernate.show_sql", Boolean.class, false));
+//        jpaVendorAdapter.setGenerateDdl(env.getProperty("hibernate.generate-ddl", Boolean.class, false));
         return jpaVendorAdapter;
     }
 
@@ -49,5 +58,21 @@ public class JPAConfig {
         jndiDataSource.setJndiName("java:comp/env/jdbc/pool");
         jndiDataSource.setResourceRef(true);
         return jndiDataSource;
+    }
+
+    private Properties jpaProperties(){
+        Properties prop = new Properties();
+        prop.put("hibernate.hbm2ddl.auto", env.getRequiredProperty("hibernate.hbm2ddl.auto"));
+        return prop;
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf){
+        return new JpaTransactionManager(emf);
+    }
+
+    @Bean
+    public static PersistenceExceptionTranslationPostProcessor persistenceExceptionTranslationPostProcessor(){
+        return new PersistenceExceptionTranslationPostProcessor();
     }
 }
