@@ -6,17 +6,15 @@ import lk.ijse.dep8.tasks.entity.User;
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Scope("prototype")
 @Repository
 public class UserDAOImpl extends CrudDAOImpl<User, String> implements UserDAO {
 
-    public UserDAOImpl(@Nullable Session session) {
+    public UserDAOImpl(Session session) {
         this.session = session;
     }
 

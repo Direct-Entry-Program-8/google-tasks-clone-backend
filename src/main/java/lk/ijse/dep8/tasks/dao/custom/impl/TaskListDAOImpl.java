@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TaskListDAOImpl extends CrudDAOImpl<TaskList, Integer> implements TaskListDAO {
 
-    public TaskListDAOImpl(@Nullable Session session) {
+    public TaskListDAOImpl(Session session) {
         this.session = session;
     }
 }
