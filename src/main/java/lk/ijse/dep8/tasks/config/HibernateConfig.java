@@ -29,6 +29,7 @@ public class HibernateConfig {
     }
 
     @Bean
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public LocalSessionFactoryBean sessionFactory(DataSource ds){
         LocalSessionFactoryBean lsfb = new LocalSessionFactoryBean();
         lsfb.setDataSource(ds);
@@ -55,5 +56,10 @@ public class HibernateConfig {
     @Bean
     public PlatformTransactionManager transactionManager(SessionFactory sf){
         return new HibernateTransactionManager(sf);
+    }
+
+    @Bean
+    public static PersistenceExceptionTranslationPostProcessor persistenceExceptionTranslationPostProcessor(){
+        return new PersistenceExceptionTranslationPostProcessor();
     }
 }
