@@ -6,12 +6,11 @@ import lk.ijse.dep8.tasks.entity.User;
 import lk.ijse.dep8.tasks.service.custom.UserService;
 import lk.ijse.dep8.tasks.service.exception.FailedExecutionException;
 import lk.ijse.dep8.tasks.service.util.EntityDTOMapper;
-import lk.ijse.dep8.tasks.service.util.HibernateUtil;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Part;
 import java.io.IOException;
@@ -24,26 +23,21 @@ import java.util.logging.Logger;
 
 @Scope("prototype")
 @Component
+@Transactional
 public class UserServiceImpl implements UserService {
 
+    private final Logger logger = Logger.getLogger(UserServiceImpl.class.getName());
     @Autowired
     private UserDAO userDAO;
 
-    private final Logger logger = Logger.getLogger(UserServiceImpl.class.getName());
-
     public boolean existsUser(String userIdOrEmail) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            userDAO.setSession(session);
-            return userDAO.existsUserByEmailOrId(userIdOrEmail);
-        }
+        return userDAO.existsUserByEmailOrId(userIdOrEmail);
     }
 
     public UserDTO registerUser(Part picture,
                                 String appLocation,
                                 UserDTO user) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
         try {
-            session.beginTransaction();
             user.setId(UUID.randomUUID().toString());
 
             if (picture != null) {
@@ -51,7 +45,6 @@ public class UserServiceImpl implements UserService {
             }
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            userDAO.setSession(session);
             // DTO -> Entity
             User userEntity = EntityDTOMapper.getUser(user);
             User savedUser = userDAO.save(userEntity);
@@ -68,33 +61,20 @@ public class UserServiceImpl implements UserService {
                 picture.write(picturePath);
             }
 
-            session.getTransaction().commit();
             return user;
         } catch (Throwable t) {
-            if (session != null && session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
             throw new FailedExecutionException("Failed to save the user", t);
-        } finally {
-            session.close();
         }
     }
 
     public UserDTO getUser(String userIdOrEmail) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            userDAO.setSession(session);
-            Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
-            return EntityDTOMapper.getUserDTO(userWrapper.orElse(null));
-        }
+        Optional<User> userWrapper = userDAO.findUserByIdOrEmail(userIdOrEmail);
+        return EntityDTOMapper.getUserDTO(userWrapper.orElse(null));
     }
 
     public void deleteUser(String userId, String appLocation) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
         try {
-            session.beginTransaction();
-            userDAO.setSession(session);
             userDAO.deleteById(userId);
-            session.getTransaction().commit();
 
             new Thread(() -> {
                 Path imagePath = Paths.get(appLocation, "uploads",
@@ -106,23 +86,16 @@ public class UserServiceImpl implements UserService {
                 }
             }).start();
         } catch (Throwable t) {
-            if (session != null && session.getTransaction() != null) session.getTransaction().rollback();
             throw new FailedExecutionException("Failed to delete the user", t);
-        } finally {
-            session.close();
         }
 
     }
 
     public void updateUser(UserDTO user, Part picture,
                            String appLocation) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
         try {
-            session.beginTransaction();
-
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
 
-            userDAO.setSession(session);
             // Fetch the current user
             User userEntity = userDAO.findById(user.getId()).get();
 
@@ -146,12 +119,8 @@ public class UserServiceImpl implements UserService {
                 Files.deleteIfExists(picturePath);
             }
 
-            session.getTransaction().commit();
         } catch (Throwable e) {
-            if (session != null && session.getTransaction() != null) session.getTransaction().rollback();
             throw new FailedExecutionException("Failed to update the user", e);
-        } finally {
-            session.close();
         }
     }
 
