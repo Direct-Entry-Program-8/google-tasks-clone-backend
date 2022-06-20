@@ -5,5 +5,5 @@ import org.springframework.context.annotation.Configuration;
 
 @ComponentScan("lk.ijse.dep8.tasks")
 @Configuration
-public class AppConfig {
+public class AppConfig{
 }
