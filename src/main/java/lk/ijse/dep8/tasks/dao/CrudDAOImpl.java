@@ -3,6 +3,7 @@ package lk.ijse.dep8.tasks.dao;
 import lk.ijse.dep8.tasks.entity.SuperEntity;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -12,6 +13,7 @@ public abstract class CrudDAOImpl<T extends SuperEntity, ID extends Serializable
         implements CrudDAO<T, ID> {
 
     private final Class<T> entityClsObj;
+    @PersistenceContext
     protected EntityManager em;
 
     public CrudDAOImpl() {

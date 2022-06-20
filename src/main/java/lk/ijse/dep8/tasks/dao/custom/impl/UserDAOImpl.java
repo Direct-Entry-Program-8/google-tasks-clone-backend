@@ -8,15 +8,12 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
 import java.util.Optional;
 
 @Scope("prototype")
 @Repository
 public class UserDAOImpl extends CrudDAOImpl<User, String> implements UserDAO {
-
-    public UserDAOImpl(EntityManager em) {
-        this.em = em;
-    }
 
     @Override
     public boolean existsUserByEmailOrId(String emailOrId) {

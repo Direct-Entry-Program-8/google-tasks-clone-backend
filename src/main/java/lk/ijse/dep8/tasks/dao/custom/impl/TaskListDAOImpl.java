@@ -7,12 +7,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Scope("prototype")
 @Repository
 public class TaskListDAOImpl extends CrudDAOImpl<TaskList, Integer> implements TaskListDAO {
 
-    public TaskListDAOImpl(EntityManager em) {
-        this.em = em;
-    }
+
 }

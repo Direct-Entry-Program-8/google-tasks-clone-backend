@@ -6,16 +6,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Scope("prototype")
 @Repository
 public class QueryDAOImpl implements QueryDAO {
 
-    private final EntityManager em;
-
-    public QueryDAOImpl(EntityManager em) {
-        this.em = em;
-    }
+    @PersistenceContext
+    private EntityManager em;
 
     @Override
     public CustomEntity getTaskListInformation(int taskListId) {
