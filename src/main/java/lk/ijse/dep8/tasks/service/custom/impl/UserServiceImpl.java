@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDAO userDAO;
 
+    @Transactional(readOnly = true)
     public boolean existsUser(String userIdOrEmail) {
         return userDAO.existsUserByEmailOrId(userIdOrEmail);
     }
