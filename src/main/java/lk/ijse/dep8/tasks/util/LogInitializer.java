@@ -30,12 +30,12 @@ public class LogInitializer {
     private ScheduledExecutorService executor;
 
     @PreDestroy
-    public void contextDestroyed(ServletContextEvent sce) {
+    public void contextDestroyed() {
         executor.shutdownNow();
     }
 
     @PostConstruct
-    public void contextInitialized(ServletContextEvent sce) {
+    public void contextInitialized() {
 
         Logger.getLogger("lk.ijse.dep8.tasks").addHandler(new ConsoleHandler());
 
