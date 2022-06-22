@@ -1,8 +1,10 @@
-package lk.ijse.dep8.tasks.listener;
+package lk.ijse.dep8.tasks.util;
 
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,19 +22,19 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebListener
-public class LogInitializer implements ServletContextListener {
+@Component
+public class LogInitializer {
 
     private final Logger logger = Logger.getLogger(LogInitializer.class.getName());
     private FileHandler fileHandler;
     private ScheduledExecutorService executor;
 
-    @Override
+    @PreDestroy
     public void contextDestroyed(ServletContextEvent sce) {
         executor.shutdownNow();
     }
 
-    @Override
+    @PostConstruct
     public void contextInitialized(ServletContextEvent sce) {
 
         Logger.getLogger("lk.ijse.dep8.tasks").addHandler(new ConsoleHandler());
