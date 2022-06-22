@@ -4,6 +4,7 @@ import lk.ijse.dep8.tasks.dto.UserDTO;
 import lk.ijse.dep8.tasks.service.custom.UserService;
 import lk.ijse.dep8.tasks.util.ResponseStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -22,7 +23,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO saveUser(String name, String email, String password, Part picture,
                          HttpServletRequest request) {
         if (name == null || !name.matches("[A-Za-z ]+")) {
@@ -60,8 +62,12 @@ public class UserController {
 
     }
 
-    @GetMapping
-    public void getUser() {
-
+    @GetMapping(path = "/{userId:[A-Fa-f0-9\\-]{36}}", produces = "application/json")
+    public UserDTO getUser(@PathVariable String userId) {
+        if (!userService.existsUser(userId)) {
+            throw new ResponseStatusException(404, "Invalid user id");
+        } else {
+            return userService.getUser(userId);
+        }
     }
 }
