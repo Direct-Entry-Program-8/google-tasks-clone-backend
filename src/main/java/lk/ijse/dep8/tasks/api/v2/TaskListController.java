@@ -1,27 +1,16 @@
 package lk.ijse.dep8.tasks.api.v2;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbException;
-import jakarta.json.stream.JsonParser;
 import lk.ijse.dep8.tasks.dto.TaskListDTO;
-import lk.ijse.dep8.tasks.util.ResponseStatusException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.StringReader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("v1/users/{userId:[A-Fa-f0-9\\-]{36}}/lists")
@@ -37,12 +26,12 @@ public class TaskListController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(consumes = "application/json", produces = "application/json")
     public TaskListDTO saveTaskList(@PathVariable String userId,
-                             @RequestBody TaskListDTO taskList,
-                             HttpServletRequest req){
+                                    @RequestBody TaskListDTO taskList,
+                                    HttpServletRequest req) {
         try (Connection connection = pool.getConnection()) {
 
             if (taskList.getTitle() == null || taskList.getTitle().trim().isEmpty()) {
-                throw new ResponseStatusException(400, "Invalid title or title is empty");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid title or title is empty");
             }
 
             PreparedStatement stm = connection.prepareStatement("INSERT INTO task_list (name,user_id) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
@@ -66,11 +55,11 @@ public class TaskListController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PatchMapping(path = "/{taskListId:\\d+}", consumes = "application/json")
-    public void updateTaskList(@PathVariable String userId,@PathVariable int taskListId,
-                              @RequestBody  TaskListDTO newTaskList){
+    public void updateTaskList(@PathVariable String userId, @PathVariable int taskListId,
+                               @RequestBody TaskListDTO newTaskList) {
         TaskListDTO oldTaskList = getTaskListDTO(userId, taskListId);
         if (newTaskList.getTitle() == null || newTaskList.getTitle().trim().isEmpty()) {
-            throw new ResponseStatusException(400, "Invalid title or title is empty");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid title or title is empty");
         }
 
         try (Connection connection = pool.getConnection()) {
@@ -87,7 +76,7 @@ public class TaskListController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{taskListId:\\d+}")
-    public void deleteTaskList(@PathVariable int taskListId){
+    public void deleteTaskList(@PathVariable int taskListId) {
         try (Connection connection = pool.getConnection()) {
             PreparedStatement stm = connection.prepareStatement("DELETE FROM task_list WHERE id=?");
             stm.setInt(1, taskListId);
@@ -100,7 +89,7 @@ public class TaskListController {
     }
 
     @GetMapping(path = "/{taskListId:\\d+}", produces = "application/json")
-    public TaskListDTO getTaskList(@PathVariable String userId, @PathVariable int taskListId){
+    public TaskListDTO getTaskList(@PathVariable String userId, @PathVariable int taskListId) {
         return getTaskListDTO(userId, taskListId);
     }
 
@@ -117,15 +106,15 @@ public class TaskListController {
                 String title = rst.getString("name");
                 return new TaskListDTO(id, title, userId);
             } else {
-                throw new ResponseStatusException(404, "Invalid user id or task list id");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id or task list id");
             }
         } catch (SQLException e) {
-            throw new ResponseStatusException(500, "Failed to fetch task list details");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to fetch task list details");
         }
     }
 
     @GetMapping(produces = "application/json")
-    public List<TaskListDTO> getAllTaskLists(@PathVariable String userId){
+    public List<TaskListDTO> getAllTaskLists(@PathVariable String userId) {
         try (Connection connection = pool.getConnection()) {
             PreparedStatement stm = connection.
                     prepareStatement("SELECT * FROM task_list t WHERE t.user_id=?");
@@ -139,7 +128,7 @@ public class TaskListController {
                 taskLists.add(new TaskListDTO(id, title, userId));
             }
 
-           return taskLists;
+            return taskLists;
 
         } catch (SQLException e) {
             throw new ResponseStatusException(500, e.getMessage(), e);
