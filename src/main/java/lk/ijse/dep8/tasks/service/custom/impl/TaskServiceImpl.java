@@ -1,11 +1,9 @@
 package lk.ijse.dep8.tasks.service.custom.impl;
 
 import lk.ijse.dep8.tasks.service.custom.TaskService;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Scope("prototype")
-@Component
+@Service
 public class TaskServiceImpl implements TaskService {
 
 

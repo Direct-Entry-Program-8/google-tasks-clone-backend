@@ -8,8 +8,8 @@ import lk.ijse.dep8.tasks.service.exception.FailedExecutionException;
 import lk.ijse.dep8.tasks.service.util.EntityDTOMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Part;
@@ -21,8 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-@Scope("prototype")
-@Component
+@Service
 @Transactional
 public class UserServiceImpl implements UserService {
 

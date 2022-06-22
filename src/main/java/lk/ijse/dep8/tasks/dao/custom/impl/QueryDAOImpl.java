@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 
-@Scope("prototype")
 @Repository
 public class QueryDAOImpl implements QueryDAO {
 
